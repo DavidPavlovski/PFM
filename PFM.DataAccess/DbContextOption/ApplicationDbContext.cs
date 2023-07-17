@@ -9,6 +9,7 @@ namespace PFM.DataAccess.DbContextOption
     {
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<TransactionSplit> TransactionsSplits { get; set; }
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
@@ -16,7 +17,9 @@ namespace PFM.DataAccess.DbContextOption
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new TransactionSplitConfiguration());
 
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             base.OnModelCreating(modelBuilder);

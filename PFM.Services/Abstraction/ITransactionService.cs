@@ -11,5 +11,6 @@ namespace PFM.Services.Abstraction
         Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter);
         Task<List<TransactionResponseDto>> ImportFromCSVAsync(IFormFile file);
         Task<TransactionResponseDto> CategorizeTransaction(string transactionId, TransactionCategorizeDto model);
+        Task<TransactionResponseDto> SplitTransactionAsync(string transactionId, TransactionSplitDto model);
     }
 }

@@ -23,7 +23,10 @@ namespace PFM.DataAccess.Repositories.Repository
 
         public async Task<Transaction> GetByIdAsync(string id)
         {
-            return await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext
+                            .Transactions
+                            .Include(x => x.TransactionSplits)
+                            .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<PagedSortedList<Transaction>> GetTransactionsAsync(PagerSorter pagerSorter)

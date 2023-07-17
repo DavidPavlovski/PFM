@@ -8,6 +8,7 @@ using PFM.Mapping.AutoMapper;
 using PFM.Services.Abstraction;
 using PFM.Services.Implementation;
 using PFM.Validations.Category;
+using PFM.Validations.Split;
 using System.Reflection;
 
 namespace PFM.IOC
@@ -27,10 +28,11 @@ namespace PFM.IOC
             services.AddScoped<ICategoryService, CategoryService>();
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            services.AddScoped<ITransactionSplitRepository, TransactionSplitRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             services.AddScoped<ICategoryValidator, CategoryValidator>();
-
+            services.AddScoped<ISplitValidator, SplitValidator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }

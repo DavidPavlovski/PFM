@@ -16,6 +16,7 @@ namespace PFM.DataAccess.Configurations
             builder
                 .Property(x => x.Currency)
                 .HasMaxLength(3);
+            builder.HasMany(x => x.TransactionSplits);
         }
     }
 }

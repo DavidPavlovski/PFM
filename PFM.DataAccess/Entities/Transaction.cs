@@ -1,6 +1,4 @@
-﻿using CsvHelper.Configuration.Attributes;
-using PFM.Enums;
-using System.ComponentModel;
+﻿using PFM.Enums;
 
 namespace PFM.DataAccess.Entities
 {
@@ -17,6 +15,6 @@ namespace PFM.DataAccess.Entities
         public TransactionKind Kind { get; set; }
         public string? CatCode { get; set; }
         public Category Category { get; set; }
-       
+        public List<TransactionSplit> TransactionSplits { get; set; }
     }
 }

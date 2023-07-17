@@ -2,6 +2,6 @@
 {
     public class TransactionCategorizeDto
     {
-        public string CategoryCode { get; set; }
+        public string CatCode { get; set; }
     }
 }

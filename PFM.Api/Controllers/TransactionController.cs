@@ -35,9 +35,10 @@ namespace PFM.Api.Controllers
         }
 
         [HttpPost("{transactionId}/Split")]
-        public async Task<IActionResult> SplitTransaction([FromRoute] int transactionId)
+        public async Task<IActionResult> SplitTransaction([FromRoute] string transactionId, [FromBody] TransactionSplitDto model)
         {
-            return Ok();
+            var res = await _transactionService.SplitTransactionAsync(transactionId, model);
+            return Ok(res);
         }
 
         [HttpPost("{transactionId}/Categorize")]
