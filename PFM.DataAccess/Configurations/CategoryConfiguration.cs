@@ -11,6 +11,7 @@ namespace PFM.DataAccess.Configurations
         {
             builder.HasKey(x => x.Code);
             builder.HasMany(x => x.Transactions);
+            builder.Property(x => x.ParentCode).IsRequired(false);
         }
     }
 }

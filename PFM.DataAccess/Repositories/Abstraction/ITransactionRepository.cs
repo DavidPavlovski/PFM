@@ -7,7 +7,7 @@ namespace PFM.DataAccess.Repositories.Abstraction
     {
         Task<Transaction> GetByIdAsync(string id);
         Task<PagedSortedList<Transaction>> GetTransactionsAsync(PagerSorter pagerSorter);
-        void InsertTransactions(List<Transaction> entities);
+        void ImportTransactions(List<Transaction> entities);
         Task<bool> ExistsAsync(string id);
         void Update(Transaction entity);
     }

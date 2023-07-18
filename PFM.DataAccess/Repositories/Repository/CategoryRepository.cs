@@ -19,9 +19,25 @@ namespace PFM.DataAccess.Repositories.Repository
             return await _dbContext.Categories.AnyAsync(x => x.Code == code);
         }
 
-        public void InsertCategories(List<Category> entities)
+        public async Task<List<Category>> GetCategories(string? parentCode)
         {
-            _dbContext.Categories.UpdateRange(entities);
+            return await _dbContext.Categories
+                            .Where(x => parentCode == null ?
+                            x.ParentCode == string.Empty :
+                            x.ParentCode == parentCode)
+                            .ToListAsync();
+        }
+
+        public void ImportCategories(List<Category> entities)
+        {
+            if (_dbContext.Categories.Any())
+            {
+                _dbContext.Categories.UpdateRange(entities);
+            }
+            else
+            {
+                _dbContext.Categories.AddRange(entities);
+            }
         }
     }
 }

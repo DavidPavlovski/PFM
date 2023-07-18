@@ -40,7 +40,7 @@ namespace PFM.Services.Implementation
         public async Task<List<TransactionResponseDto>> ImportFromCSVAsync(IFormFile file)
         {
             var transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-            _transactionRepository.InsertTransactions(transactions);
+            _transactionRepository.ImportTransactions(transactions);
             try
             {
                 await _unitOfWork.SaveChangesAsync();
@@ -55,6 +55,10 @@ namespace PFM.Services.Implementation
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction == null)
+            {
+                return null;
+            }
+            if (transaction.TransactionSplits.Any())
             {
                 return null;
             }

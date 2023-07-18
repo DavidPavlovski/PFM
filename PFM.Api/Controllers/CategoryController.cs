@@ -24,5 +24,12 @@ namespace PFM.Api.Controllers
             }
             return Ok(res);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategories([FromQuery] string? parentCode = null)
+        {
+            var res = await _categoryService.GetCategories(parentCode);
+            return Ok(res);
+        }
     }
 }

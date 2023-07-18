@@ -72,9 +72,16 @@ namespace PFM.DataAccess.Repositories.Repository
             return new(pagerSorter, items, totalCount);
         }
 
-        public void InsertTransactions(List<Transaction> entities)
+        public void ImportTransactions(List<Transaction> entities)
         {
-            _dbContext.UpdateRange(entities);
+            if (_dbContext.Transactions.Any())
+            {
+                _dbContext.UpdateRange(entities);
+            }
+            else
+            {
+                _dbContext.Transactions.AddRange(entities);
+            }
         }
 
         public void Update(Transaction entity)

@@ -37,7 +37,7 @@ namespace PFM.DataAccess.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("PFM.DataAccess.Entities.Transaction", b =>
@@ -80,7 +80,7 @@ namespace PFM.DataAccess.Migrations
 
                     b.HasIndex("CatCode");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("PFM.DataAccess.Entities.TransactionSplit", b =>
@@ -106,7 +106,7 @@ namespace PFM.DataAccess.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("TransactionsSplits");
+                    b.ToTable("TransactionsSplits", (string)null);
                 });
 
             modelBuilder.Entity("PFM.DataAccess.Entities.Transaction", b =>

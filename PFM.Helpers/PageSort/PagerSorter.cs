@@ -9,7 +9,7 @@ namespace PFM.Helpers.PageSort
         public DateTime? EndDate { get; set; } = null;
         public int Page { get; set; } = 0;
         public int PageSize { get; set; } = 10;
-        public string SortBy { get; set; } = string.Empty;
+        public string? SortBy { get; set; } = null;
         public SortDirection SortOrder { get; set; } = SortDirection.Asc;
     }
 }
