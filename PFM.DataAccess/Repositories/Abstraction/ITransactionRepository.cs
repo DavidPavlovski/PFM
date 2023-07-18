@@ -1,4 +1,5 @@
 ﻿using PFM.DataAccess.Entities;
+using PFM.Helpers.Analytics;
 using PFM.Helpers.PageSort;
 
 namespace PFM.DataAccess.Repositories.Abstraction
@@ -10,5 +11,6 @@ namespace PFM.DataAccess.Repositories.Abstraction
         void ImportTransactions(List<Transaction> entities);
         Task<bool> ExistsAsync(string id);
         void Update(Transaction entity);
+        Task<List<Transaction>> GetTransactionsAnalyticsAsync(AnalyticsQuery analyticsQuery);
     }
 }

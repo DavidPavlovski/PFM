@@ -2,6 +2,7 @@
 using PFM.DataAccess.DbContextOption;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
+using PFM.Helpers.Analytics;
 using PFM.Helpers.Extensions;
 using PFM.Helpers.PageSort;
 
@@ -29,21 +30,47 @@ namespace PFM.DataAccess.Repositories.Repository
                             .FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<List<Transaction>> GetTransactionsAnalyticsAsync(AnalyticsQuery analyticsQuery)
+        {
+            var query = _dbContext.Transactions.Where(x => x.CatCode != null).AsQueryable();
+            if (analyticsQuery.CatCode is not null)
+            {
+                query = query.Where(x => x.CatCode == analyticsQuery.CatCode);
+            }
+            if (analyticsQuery.Direction is not null)
+            {
+                query = query.Where(x => x.Direction == analyticsQuery.Direction);
+            }
+            if (analyticsQuery.StartDate is not null)
+            {
+                query = query.Where(x => x.Date >= analyticsQuery.StartDate);
+            }
+            if (analyticsQuery.EndDate is not null)
+            {
+                query = query.Where(x => x.Date <= analyticsQuery.EndDate);
+            }
+            return await query.ToListAsync();
+        }
+
         public async Task<PagedSortedList<Transaction>> GetTransactionsAsync(PagerSorter pagerSorter)
         {
-            var query = _dbContext.Transactions.Include(x => x.Category).AsQueryable();
+            var query = _dbContext
+                            .Transactions
+                            .Include(x => x.Category)
+                            .Include(x => x.TransactionSplits)
+                            .AsQueryable();
 
-            if (pagerSorter.TransactionKind.HasValue)
+            if (pagerSorter.TransactionKind is not null)
             {
                 query = query.Where(x => x.Kind == pagerSorter.TransactionKind);
             }
 
-            if (pagerSorter.StartDate.HasValue)
+            if (pagerSorter.StartDate is not null)
             {
                 query = query.Where(x => x.Date >= pagerSorter.StartDate);
             }
 
-            if (pagerSorter.EndDate.HasValue)
+            if (pagerSorter.EndDate is not null)
             {
                 query = query.Where(x => x.Date <= pagerSorter.EndDate);
             }

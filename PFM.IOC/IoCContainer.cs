@@ -25,10 +25,12 @@ namespace PFM.IOC
 
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IAnalyticsService, AnalyticsService>();
 
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<ITransactionSplitRepository, TransactionSplitRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+
 
             services.AddScoped<ICategoryValidator, CategoryValidator>();
             services.AddScoped<ISplitValidator, SplitValidator>();

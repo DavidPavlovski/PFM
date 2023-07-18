@@ -41,7 +41,7 @@ namespace PFM.Services.Implementation
         public async Task<Result<List<TransactionResponseDto>>> ImportFromCSVAsync(IFormFile file)
         {
             var transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-            if (transactions == null)
+            if (transactions is null)
             {
                 var exception = new Exception("Error occured while reading CSV file");
                 return new Result<List<TransactionResponseDto>>(exception);
@@ -61,7 +61,7 @@ namespace PFM.Services.Implementation
         public async Task<Result<TransactionResponseDto>> CategorizeTransaction(string transactionId, TransactionCategorizeDto model)
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
-            if (transaction == null)
+            if (transaction is null)
             {
                 var notFoundException = new KeyNotFoundException("Transaction does not exist");
                 return new Result<TransactionResponseDto>(notFoundException);
@@ -93,22 +93,26 @@ namespace PFM.Services.Implementation
         public async Task<Result<TransactionResponseDto>> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
-            if (transaction == null)
+            if (transaction is null)
             {
                 var notFoundException = new KeyNotFoundException("Transaction does not exist");
                 return new Result<TransactionResponseDto>(notFoundException);
             }
+
             transaction.CatCode = "Z";
             _transactionRepository.Update(transaction);
+
             if (transaction.TransactionSplits.Any())
             {
                 _transactionSplitRepository.DeleteRange(transaction.TransactionSplits);
             }
+
             if (!_splitValidator.ValidateAmmount(transaction.Ammount, model.Splits.Sum(x => x.Ammount)))
             {
                 var notFoundException = new KeyNotFoundException("The transaction split ammounts do not correspond with the total ammount of the transaction");
                 return new Result<TransactionResponseDto>(notFoundException);
             }
+
             var splits = new List<TransactionSplit>();
             foreach (var split in model.Splits)
             {
