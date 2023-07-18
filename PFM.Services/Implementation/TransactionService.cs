@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
@@ -37,10 +38,15 @@ namespace PFM.Services.Implementation
             return _mapper.Map<PagedSortedList<TransactionResponseDto>>(res);
         }
 
-        public async Task<List<TransactionResponseDto>> ImportFromCSVAsync(IFormFile file)
+        public async Task<Result<List<TransactionResponseDto>>> ImportFromCSVAsync(IFormFile file)
         {
             var transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-            _transactionRepository.ImportTransactions(transactions);
+            if (transactions == null)
+            {
+                var exception = new Exception("Error occured while reading CSV file");
+                return new Result<List<TransactionResponseDto>>(exception);
+            }
+
             try
             {
                 await _unitOfWork.SaveChangesAsync();
@@ -48,23 +54,27 @@ namespace PFM.Services.Implementation
             }
             catch
             {
-                return null;
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<List<TransactionResponseDto>>(exception);
             }
         }
-        public async Task<TransactionResponseDto> CategorizeTransaction(string transactionId, TransactionCategorizeDto model)
+        public async Task<Result<TransactionResponseDto>> CategorizeTransaction(string transactionId, TransactionCategorizeDto model)
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction == null)
             {
-                return null;
+                var notFoundException = new KeyNotFoundException("Transaction does not exist");
+                return new Result<TransactionResponseDto>(notFoundException);
             }
             if (transaction.TransactionSplits.Any())
             {
-                return null;
+                var exception = new Exception("Cannot categorize Split Transaction");
+                return new Result<TransactionResponseDto>(exception);
             }
             if (!await _categoryValidator.ExistsAsync(model.CatCode))
             {
-                return null;
+                var notFoundException = new KeyNotFoundException("Category does not exist");
+                return new Result<TransactionResponseDto>(notFoundException);
             }
             transaction.CatCode = model.CatCode;
             _transactionRepository.Update(transaction);
@@ -75,16 +85,18 @@ namespace PFM.Services.Implementation
             }
             catch
             {
-                return null;
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<TransactionResponseDto>(exception);
             }
         }
 
-        public async Task<TransactionResponseDto> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
+        public async Task<Result<TransactionResponseDto>> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction == null)
             {
-                return null;
+                var notFoundException = new KeyNotFoundException("Transaction does not exist");
+                return new Result<TransactionResponseDto>(notFoundException);
             }
             transaction.CatCode = "Z";
             _transactionRepository.Update(transaction);
@@ -94,14 +106,16 @@ namespace PFM.Services.Implementation
             }
             if (!_splitValidator.ValidateAmmount(transaction.Ammount, model.Splits.Sum(x => x.Ammount)))
             {
-                return null;
+                var notFoundException = new KeyNotFoundException("The transaction split ammounts do not correspond with the total ammount of the transaction");
+                return new Result<TransactionResponseDto>(notFoundException);
             }
             var splits = new List<TransactionSplit>();
             foreach (var split in model.Splits)
             {
                 if (!await _categoryValidator.ExistsAsync(split.CatCode))
                 {
-                    return null;
+                    var notFoundException = new KeyNotFoundException("Category does not exist");
+                    return new Result<TransactionResponseDto>(notFoundException);
                 }
                 splits.Add(new TransactionSplit
                 {
@@ -118,7 +132,8 @@ namespace PFM.Services.Implementation
             }
             catch
             {
-                return null;
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<TransactionResponseDto>(exception);
             }
         }
     }

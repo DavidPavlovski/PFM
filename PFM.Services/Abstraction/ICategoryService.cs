@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using PFM.DataAccess.Entities;
+﻿using LanguageExt.Common;
+using Microsoft.AspNetCore.Http;
 using PFM.DataTransfer.Category;
 
 namespace PFM.Services.Abstraction
 {
     public interface ICategoryService
     {
-        Task<List<CategoryResponseDto>> ImportCategoriesAsync(IFormFile file);
+        Task<Result<List<CategoryResponseDto>>> ImportCategoriesAsync(IFormFile file);
         Task<List<CategoryResponseDto>> GetCategories(string? parentCode);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
@@ -29,9 +30,14 @@ namespace PFM.Services.Implementation
             return _mapper.Map<List<CategoryResponseDto>>(res);
         }
 
-        public async Task<List<CategoryResponseDto>> ImportCategoriesAsync(IFormFile file)
+        public async Task<Result<List<CategoryResponseDto>>> ImportCategoriesAsync(IFormFile file)
         {
             var categories = CSVParser.ParseCSV<Category, CategoryCSVMap>(file);
+            if (categories is null)
+            {
+                var exception = new Exception("Error occured while reading CSV file");
+                return new Result<List<CategoryResponseDto>>(exception);
+            }
             _categoryRepository.ImportCategories(categories);
             try
             {
@@ -40,7 +46,8 @@ namespace PFM.Services.Implementation
             }
             catch
             {
-                return null;
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<List<CategoryResponseDto>>(exception);
             }
         }
 

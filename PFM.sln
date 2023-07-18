@@ -13,13 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Services", "PFM.Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.IOC", "PFM.IOC\PFM.IOC.csproj", "{6D6A2A91-1F5D-44A7-8A49-FAB672878108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFM.Helpers", "PFM.Helpers\PFM.Helpers.csproj", "{3AE4B140-AE03-4698-95C2-F00462CACF16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Helpers", "PFM.Helpers\PFM.Helpers.csproj", "{3AE4B140-AE03-4698-95C2-F00462CACF16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFM.DataTransfer", "PFM.DataTransfer\PFM.DataTransfer.csproj", "{D6D64556-29E0-4FCF-BEC8-F413742D7041}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.DataTransfer", "PFM.DataTransfer\PFM.DataTransfer.csproj", "{D6D64556-29E0-4FCF-BEC8-F413742D7041}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFM.Enums", "PFM.Enums\PFM.Enums.csproj", "{E318A863-A3C8-4845-894E-FE9248E8C6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Enums", "PFM.Enums\PFM.Enums.csproj", "{E318A863-A3C8-4845-894E-FE9248E8C6AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFM.Validations", "PFM.Validations\PFM.Validations.csproj", "{83932381-65CD-463A-95B1-645A2E7B0881}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Validations", "PFM.Validations\PFM.Validations.csproj", "{83932381-65CD-463A-95B1-645A2E7B0881}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

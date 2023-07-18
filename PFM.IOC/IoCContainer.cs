@@ -9,7 +9,6 @@ using PFM.Services.Abstraction;
 using PFM.Services.Implementation;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
-using System.Reflection;
 
 namespace PFM.IOC
 {

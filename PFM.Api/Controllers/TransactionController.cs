@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PFM.Services.Abstraction;
-using PFM.Helpers.PageSort;
 using PFM.DataTransfer.Transaction;
+using PFM.Helpers.Extensions;
+using PFM.Helpers.PageSort;
+using PFM.Services.Abstraction;
 
 namespace PFM.Api.Controllers
 {
@@ -27,30 +28,21 @@ namespace PFM.Api.Controllers
         public async Task<IActionResult> ImportTransactions(IFormFile file)
         {
             var res = await _transactionService.ImportFromCSVAsync(file);
-            if (res == null)
-            {
-                return BadRequest("Something went wrong while processing your request");
-            }
-            return Ok(res);
+            return res.ToOk();
         }
 
         [HttpPost("{transactionId}/Split")]
         public async Task<IActionResult> SplitTransaction([FromRoute] string transactionId, [FromBody] TransactionSplitDto model)
         {
             var res = await _transactionService.SplitTransactionAsync(transactionId, model);
-            return Ok(res);
+            return res.ToOk();
         }
 
         [HttpPost("{transactionId}/Categorize")]
         public async Task<IActionResult> CategorizeTransaction([FromRoute] string transactionId, [FromBody] TransactionCategorizeDto model)
         {
-
             var res = await _transactionService.CategorizeTransaction(transactionId, model);
-            if (res == null)
-            {
-                return BadRequest("Something went wrong while processing your request");
-            }
-            return Ok(res);
+            return res.ToOk();
         }
         [HttpPost("AutoCategorize")]
         public async Task<IActionResult> AutoCategorize()

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PFM.Helpers.Extensions;
 using PFM.Services.Abstraction;
 
 namespace PFM.Api.Controllers
@@ -18,11 +19,7 @@ namespace PFM.Api.Controllers
         public async Task<IActionResult> ImportCategories(IFormFile file)
         {
             var res = await _categoryService.ImportCategoriesAsync(file);
-            if (res == null)
-            {
-                return BadRequest("Something went wrong while processing your request.");
-            }
-            return Ok(res);
+            return res.ToOk();
         }
 
         [HttpGet]

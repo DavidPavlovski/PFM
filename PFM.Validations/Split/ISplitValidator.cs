@@ -2,6 +2,6 @@
 {
     public interface ISplitValidator
     {
-        bool ValidateAmmount(double transactionAmmoun , double splitAmmount);
+        bool ValidateAmmount(double transactionAmmoun, double splitAmmount);
     }
 }
