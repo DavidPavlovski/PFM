@@ -5,6 +5,7 @@ using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
 using PFM.DataTransfer.Category;
+using PFM.DataTransfer.Transaction;
 using PFM.Helpers.CSVParser;
 using PFM.Mapping.CSVMapping;
 using PFM.Services.Abstraction;
@@ -32,12 +33,21 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<List<CategoryResponseDto>>> ImportCategoriesAsync(IFormFile file)
         {
-            var categories = CSVParser.ParseCSV<Category, CategoryCSVMap>(file);
-            if (categories is null)
+            List<Category> categories;
+            try
             {
-                var exception = new Exception("Error occured while reading CSV file");
-                return new Result<List<CategoryResponseDto>>(exception);
+                categories = CSVParser.ParseCSV<Category, CategoryCSVMap>(file);
+                if (categories is null)
+                {
+                    var exception = new FileLoadException("Error occured while reading CSV file");
+                    return new Result<List<CategoryResponseDto>>(exception);
+                }
             }
+            catch (ArgumentException aex)
+            {
+                return new Result<List<CategoryResponseDto>>(aex);
+            }
+
             _categoryRepository.ImportCategories(categories);
             try
             {

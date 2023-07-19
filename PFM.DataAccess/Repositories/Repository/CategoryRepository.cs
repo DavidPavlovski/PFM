@@ -30,13 +30,16 @@ namespace PFM.DataAccess.Repositories.Repository
 
         public void ImportCategories(List<Category> entities)
         {
-            if (_dbContext.Categories.Any())
+            foreach (var entity in entities)
             {
-                _dbContext.Categories.UpdateRange(entities);
-            }
-            else
-            {
-                _dbContext.Categories.AddRange(entities);
+                if (_dbContext.Categories.Contains(entity))
+                {
+                    _dbContext.Categories.Update(entity);
+                }
+                else
+                {
+                    _dbContext.Categories.Add(entity);
+                }
             }
         }
     }

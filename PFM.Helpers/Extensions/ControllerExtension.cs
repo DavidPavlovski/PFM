@@ -14,11 +14,19 @@ namespace PFM.Helpers.Extensions
             {
                 if (error is KeyNotFoundException kex)
                 {
-                    return new NotFoundObjectResult(kex);
+                    return new NotFoundObjectResult(kex.ToExceptionResponse());
                 }
-                if (error is Exception ex)
+                if (error is ArgumentException aEx)
                 {
-                    return new BadRequestObjectResult(ex);
+                    return new BadRequestObjectResult(aEx.ToExceptionResponse());
+                }
+                if (error is InvalidOperationException ioEx)
+                {
+                    return new BadRequestObjectResult(ioEx.ToExceptionResponse());
+                }
+                if (error is FileLoadException fEx)
+                {
+                    return new BadRequestObjectResult(fEx.ToExceptionResponse());
                 }
                 return new StatusCodeResult(500);
             });

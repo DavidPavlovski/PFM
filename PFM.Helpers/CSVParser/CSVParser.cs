@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
+using System.Formats.Asn1;
 using System.Globalization;
 using System.Text;
 
@@ -12,6 +13,7 @@ namespace PFM.Helpers.CSVParser
         {
             try
             {
+
                 using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
                 using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
                 csv.Context.RegisterClassMap<TMap>();
@@ -23,8 +25,16 @@ namespace PFM.Helpers.CSVParser
                 }
                 return entities;
             }
-            catch
+            catch (CsvHelperException csvEx)
             {
+                if (csvEx.InnerException is ArgumentNullException anEx)
+                {
+                    throw new ArgumentNullException(anEx.Message);
+                }
+                if (csvEx.InnerException is ArgumentException aex)
+                {
+                    throw new ArgumentException(aex.Message);
+                }
                 return default;
             }
         }

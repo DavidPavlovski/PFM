@@ -11,6 +11,7 @@ using PFM.Mapping.CSVMapping;
 using PFM.Services.Abstraction;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
+using System;
 
 namespace PFM.Services.Implementation
 {
@@ -40,11 +41,20 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<List<TransactionResponseDto>>> ImportFromCSVAsync(IFormFile file)
         {
-            var transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-            if (transactions is null)
+            List<Transaction> transactions;
+            try
             {
-                var exception = new Exception("Error occured while reading CSV file");
-                return new Result<List<TransactionResponseDto>>(exception);
+                transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
+                if (transactions is null)
+                {
+                    var exception = new FileLoadException("Error occured while reading CSV file");
+                    return new Result<List<TransactionResponseDto>>(exception);
+                }
+                _transactionRepository.ImportTransactions(transactions);
+            }
+            catch (ArgumentException aex)
+            {
+                return new Result<List<TransactionResponseDto>>(aex);
             }
 
             try
@@ -68,7 +78,7 @@ namespace PFM.Services.Implementation
             }
             if (transaction.TransactionSplits.Any())
             {
-                var exception = new Exception("Cannot categorize Split Transaction");
+                var exception = new InvalidOperationException("Cannot categorize Split Transaction");
                 return new Result<TransactionResponseDto>(exception);
             }
             if (!await _categoryValidator.ExistsAsync(model.CatCode))
@@ -109,7 +119,7 @@ namespace PFM.Services.Implementation
 
             if (!_splitValidator.ValidateAmmount(transaction.Ammount, model.Splits.Sum(x => x.Ammount)))
             {
-                var notFoundException = new KeyNotFoundException("The transaction split ammounts do not correspond with the total ammount of the transaction");
+                var notFoundException = new ArgumentException("The transaction split ammounts do not correspond with the total ammount of the transaction");
                 return new Result<TransactionResponseDto>(notFoundException);
             }
 
