@@ -5,10 +5,11 @@ using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
 using PFM.DataTransfer.Category;
-using PFM.DataTransfer.Transaction;
+using PFM.Exceptions;
 using PFM.Helpers.CSVParser;
 using PFM.Mapping.CSVMapping;
 using PFM.Services.Abstraction;
+using System.Net;
 
 namespace PFM.Services.Implementation
 {
@@ -17,12 +18,13 @@ namespace PFM.Services.Implementation
         readonly IUnitOfWork _unitOfWork;
         readonly ICategoryRepository _categoryRepository;
         readonly IMapper _mapper;
-
-        public CategoryService(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository, IMapper mapper)
+        readonly ICSVParser _csvParser;
+        public CategoryService(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository, IMapper mapper, ICSVParser csvParser)
         {
             _unitOfWork = unitOfWork;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
+            _csvParser = csvParser;
         }
 
         public async Task<List<CategoryResponseDto>> GetCategories(string? parentCode)
@@ -33,13 +35,18 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<List<CategoryResponseDto>>> ImportCategoriesAsync(IFormFile file)
         {
-            List<Category> categories;
+            CSVReponse<Category> csvResponse;
             try
             {
-                categories = CSVParser.ParseCSV<Category, CategoryCSVMap>(file);
-                if (categories is null)
+                csvResponse = _csvParser.ParseCSV<Category, CategoryCSVMap>(file);
+                if (csvResponse.Errors.Any())
                 {
-                    var exception = new FileLoadException("Error occured while reading CSV file");
+                    var exception = new CustomException("Error occured while reading CSV file")
+                    {
+                        Description = "Problem occured while parsing CSV values , see errors below.",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Errors = csvResponse.Errors
+                    };
                     return new Result<List<CategoryResponseDto>>(exception);
                 }
             }
@@ -48,11 +55,11 @@ namespace PFM.Services.Implementation
                 return new Result<List<CategoryResponseDto>>(aex);
             }
 
-            _categoryRepository.ImportCategories(categories);
+            _categoryRepository.ImportCategories(csvResponse.Items);
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<List<CategoryResponseDto>>(categories.Take(10).ToList());
+                return _mapper.Map<List<CategoryResponseDto>>(csvResponse.Items.Take(10).ToList());
             }
             catch
             {

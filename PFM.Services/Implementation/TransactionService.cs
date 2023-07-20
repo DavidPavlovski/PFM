@@ -5,6 +5,7 @@ using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
 using PFM.DataTransfer.Transaction;
+using PFM.Exceptions;
 using PFM.Helpers.CSVParser;
 using PFM.Helpers.PageSort;
 using PFM.Mapping.CSVMapping;
@@ -12,6 +13,7 @@ using PFM.Services.Abstraction;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
 using System;
+using System.Net;
 
 namespace PFM.Services.Implementation
 {
@@ -23,7 +25,8 @@ namespace PFM.Services.Implementation
         readonly ICategoryValidator _categoryValidator;
         readonly ISplitValidator _splitValidator;
         readonly ITransactionSplitRepository _transactionSplitRepository;
-        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository)
+        readonly ICSVParser _csvParser;
+        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser)
         {
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
@@ -31,6 +34,7 @@ namespace PFM.Services.Implementation
             _categoryValidator = categoryValidator;
             _splitValidator = splitValidator;
             _transactionSplitRepository = transactionSplitRepository;
+            _csvParser = csvParser;
         }
 
         public async Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter)
@@ -41,16 +45,21 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<List<TransactionResponseDto>>> ImportFromCSVAsync(IFormFile file)
         {
-            List<Transaction> transactions;
+            CSVReponse<Transaction> csvResponse;
             try
             {
-                transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-                if (transactions is null)
+                csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
+                if (csvResponse.Errors.Any())
                 {
-                    var exception = new FileLoadException("Error occured while reading CSV file");
+                    var exception = new CustomException("Error occured while reading CSV file")
+                    {
+                        Description = "Problem occured while parsing CSV values , see errors below.",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Errors = csvResponse.Errors
+                    };
                     return new Result<List<TransactionResponseDto>>(exception);
                 }
-                _transactionRepository.ImportTransactions(transactions);
+                _transactionRepository.ImportTransactions(csvResponse.Items);
             }
             catch (ArgumentException aex)
             {
@@ -60,7 +69,7 @@ namespace PFM.Services.Implementation
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<List<TransactionResponseDto>>(transactions.Take(10).ToList());
+                return _mapper.Map<List<TransactionResponseDto>>(csvResponse.Items.Take(10).ToList());
             }
             catch
             {

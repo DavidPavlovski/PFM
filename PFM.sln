@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Enums", "PFM.Enums\PFM.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PFM.Validations", "PFM.Validations\PFM.Validations.csproj", "{83932381-65CD-463A-95B1-645A2E7B0881}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PFM.Exceptions", "PFM.Exceptions\PFM.Exceptions.csproj", "{53A7007F-29AF-4F98-804B-FBA08437B695}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{83932381-65CD-463A-95B1-645A2E7B0881}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83932381-65CD-463A-95B1-645A2E7B0881}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83932381-65CD-463A-95B1-645A2E7B0881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53A7007F-29AF-4F98-804B-FBA08437B695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53A7007F-29AF-4F98-804B-FBA08437B695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53A7007F-29AF-4F98-804B-FBA08437B695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53A7007F-29AF-4F98-804B-FBA08437B695}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

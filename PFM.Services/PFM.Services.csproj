@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PFM.DataAccess\PFM.DataAccess.csproj" />
+    <ProjectReference Include="..\PFM.Exceptions\PFM.Exceptions.csproj" />
     <ProjectReference Include="..\PFM.Helpers\PFM.Helpers.csproj" />
     <ProjectReference Include="..\PFM.Mapping\PFM.Mapping.csproj" />
     <ProjectReference Include="..\PFM.Validations\PFM.Validations.csproj" />

@@ -1,42 +1,68 @@
 ﻿using CsvHelper;
-using CsvHelper.Configuration;
+using LanguageExt;
 using Microsoft.AspNetCore.Http;
-using System.Formats.Asn1;
+using Microsoft.Extensions.Configuration;
+using PFM.Exceptions;
 using System.Globalization;
 using System.Text;
 
 namespace PFM.Helpers.CSVParser
 {
-    public static class CSVParser
+    public class CSVParser : ICSVParser
     {
-        public static List<T>? ParseCSV<T, TMap>(IFormFile file) where TMap : ClassMap<T>
-        {
-            try
-            {
+        readonly IConfiguration _configuration;
 
-                using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                csv.Context.RegisterClassMap<TMap>();
-                var records = csv.GetRecords<T>();
-                var entities = new List<T>();
-                foreach (var record in records)
-                {
-                    entities.Add(record);
-                }
-                return entities;
-            }
-            catch (CsvHelperException csvEx)
+        public CSVParser(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public CSVReponse<TEntity> ParseCSV<TEntity, TMap>(IFormFile file) where TMap : CustomClassMap<TEntity>
+        {
+            var rowErrorsCount = _configuration.GetValue<int>("variables:CSVErrorRows");
+            using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            var map = csv.Context.RegisterClassMap<TMap>();
+
+            var items = new List<TEntity>();
+            var rowErrors = new List<CSVRowError>();
+            while (csv.Read())
             {
-                if (csvEx.InnerException is ArgumentNullException anEx)
+                try
                 {
-                    throw new ArgumentNullException(anEx.Message);
+                    map.Errors.Clear();
+                    var item = csv.GetRecord<TEntity>();
+                    if (map.Errors.Any())
+                    {
+                        var rowError = new CSVRowError
+                        {
+                            Row = csv.Context.Parser.RawRow,
+                            Errors = map.Errors.Distinct().Select(x => x).ToList()
+                        };
+                        rowErrors.Add(rowError);
+                        if (rowErrors.Count == rowErrorsCount)
+                        {
+                            break;
+                        }
+                        continue;
+                    }
+                    items.Add(item);
                 }
-                if (csvEx.InnerException is ArgumentException aex)
+                catch (CsvHelperException csvEx)
                 {
-                    throw new ArgumentException(aex.Message);
+                    var rowError = new CSVRowError
+                    {
+                        Row = csv.Context.Parser.RawRow,
+                        Errors = map.Errors.Distinct().Select(x => x).ToList()
+                    };
+                    rowErrors.Add(rowError);
                 }
-                return default;
             }
+            return new CSVReponse<TEntity>
+            {
+                Items = items,
+                Errors = rowErrors
+            };
         }
     }
 }

@@ -4,6 +4,7 @@ using PFM.DataAccess.DbContextOption;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.Repositories.Repository;
 using PFM.DataAccess.UnitOfWork;
+using PFM.Helpers.CSVParser;
 using PFM.Mapping.AutoMapper;
 using PFM.Services.Abstraction;
 using PFM.Services.Implementation;
@@ -31,7 +32,7 @@ namespace PFM.IOC
             services.AddScoped<ITransactionSplitRepository, TransactionSplitRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-
+            services.AddScoped<ICSVParser, CSVParser>();
             services.AddScoped<ICategoryValidator, CategoryValidator>();
             services.AddScoped<ISplitValidator, SplitValidator>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
