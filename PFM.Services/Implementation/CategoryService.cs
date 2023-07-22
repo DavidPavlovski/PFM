@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
+using PFM.DataTransfer;
 using PFM.DataTransfer.Category;
 using PFM.Exceptions;
 using PFM.Helpers.CSVParser;
@@ -33,40 +34,41 @@ namespace PFM.Services.Implementation
             return _mapper.Map<List<CategoryResponseDto>>(res);
         }
 
-        public async Task<Result<List<CategoryResponseDto>>> ImportCategoriesAsync(IFormFile file)
+        public async Task<Result<ResponseModel>> ImportCategoriesAsync(IFormFile file)
         {
-            CSVReponse<Category> csvResponse;
-            try
+
+            var csvResponse = _csvParser.ParseCSV<Category, CategoryCSVMap>(file);
+            if (csvResponse is null)
             {
-                csvResponse = _csvParser.ParseCSV<Category, CategoryCSVMap>(file);
-                if (csvResponse.Errors.Any())
-                {
-                    var exception = new CustomException("Error occured while reading CSV file")
-                    {
-                        Description = "Problem occured while parsing CSV values , see errors below.",
-                        StatusCode = HttpStatusCode.BadRequest,
-                        Errors = csvResponse.Errors
-                    };
-                    return new Result<List<CategoryResponseDto>>(exception);
-                }
+                var error = new FileLoadException("Error occured while reading file , make sure the file you uploaded is a valid CSV file.");
+                return new Result<ResponseModel>(error);
             }
-            catch (ArgumentException aex)
+            if (csvResponse.Errors.Any())
             {
-                return new Result<List<CategoryResponseDto>>(aex);
+                var exception = new CustomException("Error occured while reading CSV file")
+                {
+                    Description = "Problem occured while parsing CSV values , see errors below.",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = csvResponse.Errors
+                };
+                return new Result<ResponseModel>(exception);
             }
 
             _categoryRepository.ImportCategories(csvResponse.Items);
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<List<CategoryResponseDto>>(csvResponse.Items.Take(10).ToList());
+                var res = new ResponseModel
+                {
+                    Message = "Categories imported successfully."
+                };
+                return res;
             }
             catch
             {
                 var exception = new Exception("Error occured while writing in database");
-                return new Result<List<CategoryResponseDto>>(exception);
+                return new Result<ResponseModel>(exception);
             }
         }
-
     }
 }

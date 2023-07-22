@@ -47,7 +47,7 @@ namespace PFM.Helpers.Extensions
                         StatusCode = 400,
                         Message = fEx.Message
                     };
-                    return new BadRequestObjectResult(400);
+                    return new BadRequestObjectResult(errorResponse);
                 }
                 if (error is CustomException cex)
                 {
