@@ -40,12 +40,13 @@ namespace PFM.Helpers.Extensions
                     };
                     return new BadRequestObjectResult(errorResponse);
                 }
-                if (error is FileLoadException fEx)
+                if (error is CustomFileLoadException fEx)
                 {
-                    var errorResponse = new ErrorResponse()
+                    var errorResponse = new FileErrorResponse()
                     {
                         StatusCode = 400,
-                        Message = fEx.Message
+                        Message = fEx.Message,
+                        CsvHeaders = fEx.CsvHeaders
                     };
                     return new BadRequestObjectResult(errorResponse);
                 }

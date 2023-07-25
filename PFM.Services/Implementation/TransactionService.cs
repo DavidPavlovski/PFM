@@ -53,7 +53,10 @@ namespace PFM.Services.Implementation
             var csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
             if (csvResponse is null)
             {
-                var error = new FileLoadException("Error occured while reading file , make sure the file you uploaded is a valid CSV file.");
+                var error = new CustomFileLoadException($"Error occured while reading file: '{file.FileName}', make sure the file you uploaded is a valid CSV file and you have all the required headers.")
+                {
+                    CsvHeaders = "id, beneficiary-name, date, direction, amount, description, currency, mcc, kind"
+                };
                 return new Result<ResponseModel>(error);
             }
             if (csvResponse.Errors.Any())
