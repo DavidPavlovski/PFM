@@ -1,5 +1,6 @@
 ﻿using LanguageExt.Common;
 using Microsoft.AspNetCore.Mvc;
+using PFM.Exceptions;
 
 namespace PFM.Helpers.Extensions
 {
@@ -14,19 +15,49 @@ namespace PFM.Helpers.Extensions
             {
                 if (error is KeyNotFoundException kex)
                 {
-                    return new NotFoundObjectResult(kex.ToExceptionResponse());
+                    var errorResponse = new ErrorResponse()
+                    {
+                        StatusCode = 404,
+                        Message = kex.Message
+                    };
+                    return new NotFoundObjectResult(errorResponse);
                 }
                 if (error is ArgumentException aEx)
                 {
-                    return new BadRequestObjectResult(aEx.ToExceptionResponse());
+                    var errorResponse = new ErrorResponse()
+                    {
+                        StatusCode = 400,
+                        Message = aEx.Message
+                    };
+                    return new BadRequestObjectResult(errorResponse);
                 }
                 if (error is InvalidOperationException ioEx)
                 {
-                    return new BadRequestObjectResult(ioEx.ToExceptionResponse());
+                    var errorResponse = new ErrorResponse()
+                    {
+                        StatusCode = 400,
+                        Message = ioEx.Message
+                    };
+                    return new BadRequestObjectResult(errorResponse);
                 }
                 if (error is FileLoadException fEx)
                 {
-                    return new BadRequestObjectResult(fEx.ToExceptionResponse());
+                    var errorResponse = new ErrorResponse()
+                    {
+                        StatusCode = 400,
+                        Message = fEx.Message
+                    };
+                    return new BadRequestObjectResult(errorResponse);
+                }
+                if (error is CustomException cex)
+                {
+                    var errorResponse = new CSVErrorListResponse()
+                    {
+                        Message = cex.Message,
+                        StatusCode = 400,
+                        Errors = cex.Errors
+                    };
+                    return new BadRequestObjectResult(errorResponse);
                 }
                 return new StatusCodeResult(500);
             });

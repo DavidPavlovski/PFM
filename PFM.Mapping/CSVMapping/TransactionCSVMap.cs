@@ -3,15 +3,17 @@ using ISO._4217;
 using LanguageExt.Common;
 using PFM.DataAccess.Entities;
 using PFM.Enums;
+using PFM.Helpers.CSVParser;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace PFM.Mapping.CSVMapping
 {
-    public class TransactionCSVMap : ClassMap<Transaction>
+    public class TransactionCSVMap : CustomClassMap<Transaction>
     {
         public TransactionCSVMap() : base()
         {
+
             Map(x => x.Id).Name("id");
 
             Map(x => x.BeneficiaryName).Name("beneficiary-name");
@@ -20,69 +22,67 @@ namespace PFM.Mapping.CSVMapping
             {
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Date is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'date'");
+                    Errors.Add($"Date is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'date'");
                 }
-                if (!DateTime.TryParse(field.Field, out DateTime res))
+                else if (!DateTime.TryParse(field.Field, out DateTime res))
                 {
-                    throw new ArgumentException($"'{field.Field}' is not a valid date. Problem occured at Row : {field.Row.Parser.Row} , Column : 'date'");
+                    Errors.Add($"'{field.Field}' is not a valid date. Problem occured at Row : {field.Row.Parser.Row} , Column : 'date'");
                 }
-
                 return true;
-
-            });
+            }).Default(new DateTime(), useOnConversionFailure: true);
 
             Map(x => x.Direction).Name("direction").Validate(field =>
             {
+
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Direction is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'direction'");
+                    Errors.Add($"Direction is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'direction'");
                 }
-                if (!Enum.IsDefined(typeof(Direction), field.Field))
+                else if (!Enum.IsDefined(typeof(Direction), field.Field))
                 {
-                    throw new ArgumentException($"'{field.Field}' is not a valid transaction direction. Problem occured at Row : {field.Row.Parser.Row} , Column : 'direction'");
+                    Errors.Add($"'{field.Field}' is not a valid transaction direction. Problem occured at Row : {field.Row.Parser.Row} , Column : 'direction'");
                 }
                 return true;
-            });
+            }).Default(Direction.d, useOnConversionFailure: true);
 
             Map(x => x.Ammount).Name("amount").Validate(field =>
             {
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Ammount is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
+                    Errors.Add($"Ammount is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
                 }
-                double ammount;
-                if (!double.TryParse(field.Field, out ammount))
+                else if (!double.TryParse(field.Field, out double ammount))
                 {
-                    throw new ArgumentException($"Value for Ammount : '{field.Field}' is not a valid number. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
+                    Errors.Add($"Value for Ammount : '{field.Field}' is not a valid number. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
                 }
-                if (ammount <= 0)
+                else if (ammount <= 0)
                 {
-                    throw new ArgumentException($"Ammount cannot be 0 or less. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
+                    Errors.Add($"Ammount cannot be 0 or less. Problem occured at Row : {field.Row.Parser.Row} , Column : 'amount'");
                 }
                 return true;
-            });
+            }).Default(1, useOnConversionFailure: true);
 
             Map(x => x.Description).Name("description").Validate(field =>
             {
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Description is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'description'");
+                    Errors.Add($"Description is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'description'");
                 }
                 return true;
-            });
+            }).Default(string.Empty, useOnConversionFailure: true);
 
             Map(x => x.Currency).Name("currency").Validate(field =>
             {
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Currency is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'currency'");
+                    Errors.Add($"Currency is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'currency'");
                 }
-                if (!CurrencyCodesResolver.Codes.Any(x => x.Code == field.Field))
+                else if (!CurrencyCodesResolver.Codes.Any(x => x.Code == field.Field))
                 {
-                    throw new ArgumentException($"'{field.Field}' is not a valid ISO 4217 currency code. Problem occured at Row : {field.Row.Parser.Row} , Column : 'currency'");
+                    Errors.Add($"'{field.Field}' is not a valid ISO 4217 currency code. Problem occured at Row : {field.Row.Parser.Row} , Column : 'currency'");
                 }
                 return true;
-            });
+            }).Default("USD", useOnConversionFailure: true);
 
             Map(x => x.Mcc).Name("mcc");
 
@@ -90,15 +90,17 @@ namespace PFM.Mapping.CSVMapping
             {
                 if (string.IsNullOrEmpty(field.Field))
                 {
-                    throw new ArgumentException($"Transaction kind is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'kind'");
+                    Errors.Add($"Transaction kind is requiered. Problem occured at Row : {field.Row.Parser.Row} , Column : 'kind'");
                 }
-                if (!Enum.IsDefined(typeof(TransactionKind), field.Field))
+                else if (!Enum.IsDefined(typeof(TransactionKind), field.Field))
                 {
-                    throw new ArgumentException($"'{field.Field}' is not a valid transaction kind. Problem occured at Row : {field.Row.Parser.Row} , Column : 'kind'");
+                    Errors.Add($"'{field.Field}' is not a valid transaction kind. Problem occured at Row : {field.Row.Parser.Row} , Column : 'kind'");
                 }
                 return true;
 
-            });
+            }).Default(TransactionKind.dep, useOnConversionFailure: true);
+
+
         }
     }
 }

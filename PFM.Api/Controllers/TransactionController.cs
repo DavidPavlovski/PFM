@@ -47,7 +47,8 @@ namespace PFM.Api.Controllers
         [HttpPost("AutoCategorize")]
         public async Task<IActionResult> AutoCategorize()
         {
-            return Ok();
+            var res = await _transactionService.AutoCategorize();
+            return res.ToOk();
         }
     }
 }

@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
+using PFM.DataTransfer;
 using PFM.DataTransfer.Transaction;
+using PFM.Exceptions;
 using PFM.Helpers.CSVParser;
 using PFM.Helpers.PageSort;
 using PFM.Mapping.CSVMapping;
@@ -12,6 +16,7 @@ using PFM.Services.Abstraction;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
 using System;
+using System.Net;
 
 namespace PFM.Services.Implementation
 {
@@ -23,7 +28,8 @@ namespace PFM.Services.Implementation
         readonly ICategoryValidator _categoryValidator;
         readonly ISplitValidator _splitValidator;
         readonly ITransactionSplitRepository _transactionSplitRepository;
-        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository)
+        readonly ICSVParser _csvParser;
+        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser)
         {
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
@@ -31,6 +37,7 @@ namespace PFM.Services.Implementation
             _categoryValidator = categoryValidator;
             _splitValidator = splitValidator;
             _transactionSplitRepository = transactionSplitRepository;
+            _csvParser = csvParser;
         }
 
         public async Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter)
@@ -39,74 +46,92 @@ namespace PFM.Services.Implementation
             return _mapper.Map<PagedSortedList<TransactionResponseDto>>(res);
         }
 
-        public async Task<Result<List<TransactionResponseDto>>> ImportFromCSVAsync(IFormFile file)
+        public async Task<Result<ResponseModel>> ImportFromCSVAsync(IFormFile file)
         {
-            List<Transaction> transactions;
-            try
+
+
+            var csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
+            if (csvResponse is null)
             {
-                transactions = CSVParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-                if (transactions is null)
+                var error = new FileLoadException("Error occured while reading file , make sure the file you uploaded is a valid CSV file.");
+                return new Result<ResponseModel>(error);
+            }
+            if (csvResponse.Errors.Any())
+            {
+                var exception = new CustomException("Error occured while reading CSV file")
                 {
-                    var exception = new FileLoadException("Error occured while reading CSV file");
-                    return new Result<List<TransactionResponseDto>>(exception);
-                }
-                _transactionRepository.ImportTransactions(transactions);
+                    Description = "Problem occured while parsing CSV values , see errors below.",
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = csvResponse.Errors
+                };
+                return new Result<ResponseModel>(exception);
             }
-            catch (ArgumentException aex)
-            {
-                return new Result<List<TransactionResponseDto>>(aex);
-            }
+            _transactionRepository.ImportTransactions(csvResponse.Items);
+
 
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<List<TransactionResponseDto>>(transactions.Take(10).ToList());
+                var res = new ResponseModel
+                {
+                    Message = "Transactions imported successfully."
+                };
+                return res;
             }
             catch
             {
                 var exception = new Exception("Error occured while writing in database");
-                return new Result<List<TransactionResponseDto>>(exception);
+                return new Result<ResponseModel>(exception);
             }
         }
-        public async Task<Result<TransactionResponseDto>> CategorizeTransaction(string transactionId, TransactionCategorizeDto model)
+        public async Task<Result<ResponseModel>> CategorizeTransaction(string transactionId, TransactionCategorizeDto model)
         {
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction is null)
             {
                 var notFoundException = new KeyNotFoundException("Transaction does not exist");
-                return new Result<TransactionResponseDto>(notFoundException);
+                return new Result<ResponseModel>(notFoundException);
             }
             if (transaction.TransactionSplits.Any())
             {
                 var exception = new InvalidOperationException("Cannot categorize Split Transaction");
-                return new Result<TransactionResponseDto>(exception);
+                return new Result<ResponseModel>(exception);
             }
             if (!await _categoryValidator.ExistsAsync(model.CatCode))
             {
                 var notFoundException = new KeyNotFoundException("Category does not exist");
-                return new Result<TransactionResponseDto>(notFoundException);
+                return new Result<ResponseModel>(notFoundException);
             }
             transaction.CatCode = model.CatCode;
             _transactionRepository.Update(transaction);
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<TransactionResponseDto>(transaction);
+                var res = new ResponseModel
+                {
+                    Message = "Transaction categorized successfully."
+                };
+                return res;
             }
             catch
             {
                 var exception = new Exception("Error occured while writing in database");
-                return new Result<TransactionResponseDto>(exception);
+                return new Result<ResponseModel>(exception);
             }
         }
 
-        public async Task<Result<TransactionResponseDto>> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
+        public async Task<Result<ResponseModel>> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
         {
+            if (model.Splits.Count <= 1)
+            {
+                var exception = new ArgumentException("Transaction split count must be greater than 1");
+                return new Result<ResponseModel>(exception);
+            }
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction is null)
             {
                 var notFoundException = new KeyNotFoundException("Transaction does not exist");
-                return new Result<TransactionResponseDto>(notFoundException);
+                return new Result<ResponseModel>(notFoundException);
             }
 
             transaction.CatCode = "Z";
@@ -120,7 +145,7 @@ namespace PFM.Services.Implementation
             if (!_splitValidator.ValidateAmmount(transaction.Ammount, model.Splits.Sum(x => x.Ammount)))
             {
                 var notFoundException = new ArgumentException("The transaction split ammounts do not correspond with the total ammount of the transaction");
-                return new Result<TransactionResponseDto>(notFoundException);
+                return new Result<ResponseModel>(notFoundException);
             }
 
             var splits = new List<TransactionSplit>();
@@ -129,7 +154,7 @@ namespace PFM.Services.Implementation
                 if (!await _categoryValidator.ExistsAsync(split.CatCode))
                 {
                     var notFoundException = new KeyNotFoundException("Category does not exist");
-                    return new Result<TransactionResponseDto>(notFoundException);
+                    return new Result<ResponseModel>(notFoundException);
                 }
                 splits.Add(new TransactionSplit
                 {
@@ -142,12 +167,61 @@ namespace PFM.Services.Implementation
             try
             {
                 await _unitOfWork.SaveChangesAsync();
-                return _mapper.Map<TransactionResponseDto>(transaction);
+                var res = new ResponseModel
+                {
+                    Message = "Transaction split successfully."
+                };
+                return res;
             }
             catch
             {
                 var exception = new Exception("Error occured while writing in database");
-                return new Result<TransactionResponseDto>(exception);
+                return new Result<ResponseModel>(exception);
+            }
+        }
+
+        public async Task<Result<ResponseModel>> AutoCategorize()
+        {
+            var transactions = _transactionRepository.GetAll();
+
+            List<Rule> rules = new();
+            using (StreamReader r = new("rules.json"))
+            {
+                string json = r.ReadToEnd();
+                rules = JsonConvert.DeserializeObject<List<Rule>>(json).ToList();
+            }
+
+            foreach (var transaction in transactions)
+            {
+                if (!string.IsNullOrEmpty(transaction.CatCode))
+                {
+                    continue;
+                }
+                foreach (var rule in rules)
+                {
+                    if (rule.Mcc.Any(x => x == transaction.Mcc))
+                    {
+                        transaction.CatCode = rule.CatCode;
+                    }
+                    else if (rule.Keywords.Any(x => transaction.BeneficiaryName.ToLower().Contains(x) || transaction.Description.ToLower().Contains(x)))
+                    {
+                        transaction.CatCode = rule.CatCode;
+                    }
+                }
+            }
+            try
+            {
+                await _unitOfWork.SaveChangesAsync();
+                var res = new ResponseModel
+                {
+                    Message = "Transaction split successfully."
+                };
+                return res;
+            }
+            catch
+            {
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<ResponseModel>(exception);
             }
         }
     }
