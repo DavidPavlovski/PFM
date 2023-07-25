@@ -144,7 +144,7 @@ namespace PFM.Services.Implementation
 
             if (!_splitValidator.ValidateAmmount(transaction.Ammount, model.Splits.Sum(x => x.Ammount)))
             {
-                var notFoundException = new ArgumentException("The transaction split ammounts do not correspond with the total ammount of the transaction");
+                var notFoundException = new ArgumentException($"The transaction split ammounts do not correspond with the total ammount of the transaction : {transaction.Ammount}");
                 return new Result<ResponseModel>(notFoundException);
             }
 

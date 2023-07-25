@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+using PFM.Api.Custom;
 using PFM.IOC;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,6 +12,14 @@ builder.Services.AddControllers().AddJsonOptions(opt =>
 {
     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
     opt.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+})
+.ConfigureApiBehaviorOptions(opt =>
+{
+    opt.InvalidModelStateResponseFactory = context =>
+    {
+       var custom = new CustomBadRequest(context);
+        return new BadRequestObjectResult(custom);
+    };
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -44,3 +54,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
