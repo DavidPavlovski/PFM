@@ -12,5 +12,6 @@ namespace PFM.Services.Abstraction
         Task<Result<ResponseModel>> ImportFromCSVAsync(IFormFile file);
         Task<Result<ResponseModel>> CategorizeTransaction(string transactionId, TransactionCategorizeDto model);
         Task<Result<ResponseModel>> SplitTransactionAsync(string transactionId, TransactionSplitDto model);
+        Task<Result<ResponseModel>> AutoCategorize();
     }
 }

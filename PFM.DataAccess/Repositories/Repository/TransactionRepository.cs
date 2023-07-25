@@ -23,6 +23,11 @@ namespace PFM.DataAccess.Repositories.Repository
             return await _dbContext.Transactions.AnyAsync(x => x.Id == id);
         }
 
+        public IEnumerable<Transaction> GetAll()
+        {
+            return _dbContext.Transactions;
+        }
+
         public async Task<Transaction> GetByIdAsync(string id)
         {
             return await _dbContext
@@ -36,7 +41,7 @@ namespace PFM.DataAccess.Repositories.Repository
             var query = _dbContext.Transactions.Where(x => x.CatCode != null).AsQueryable();
             if (analyticsQuery.CatCode is not null)
             {
-                query = query.Where(x => x.CatCode == analyticsQuery.CatCode);
+                query = query.Where(x => analyticsQuery.CatCode.Contains(x.CatCode));
             }
             if (analyticsQuery.Direction is not null)
             {
@@ -118,6 +123,11 @@ namespace PFM.DataAccess.Repositories.Repository
         public void Update(Transaction entity)
         {
             _dbContext.Transactions.Update(entity);
+        }
+
+        public void UpdateRange(List<Transaction> entities)
+        {
+            _dbContext.Transactions.UpdateRange(entities);
         }
     }
 }

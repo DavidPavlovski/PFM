@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="rules.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="rules.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LanguageExt.Core" Version="4.4.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.20">
       <PrivateAssets>all</PrivateAssets>

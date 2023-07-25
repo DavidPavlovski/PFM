@@ -1,0 +1,642 @@
+﻿[
+  {
+    "catCode": "2",
+    "parentCode": "B",
+    "name": "Auto Insurance",
+    "keywords": ["kasko","kasko insurance"],
+    "mcc": [6381]
+  },
+  {
+    "catCode": "3",
+    "parentCode": "B",
+    "name": "Auto Leasing",
+    "keywords": [
+    ],
+    "mcc": [
+      5511,
+      5521,
+      5551,
+      5561,
+      5571,
+      5592,
+      5598
+    ]
+  },
+  {
+    "catCode": "4",
+    "parentCode": "B",
+    "name": "Gas & Fuel",
+    "keywords": [ "chevron", "shell", "fuel", "petrol", "diesel" ],
+    "mcc": [ 5983, 5542 ]
+  },
+  {
+    "catCode": "5",
+    "parentCode": "B",
+    "name": "Parking",
+    "keywords": [ "parking", "parking fee" ],
+    "mcc": [ 7523 ]
+  },
+  {
+    "catCode": "7",
+    "parentCode": "B",
+    "name": "Service & Parts",
+    "keywords": [],
+    "mcc": [
+      5531,
+      5532,
+      5541,
+      5013
+    ]
+  },
+  {
+    "catCode": "13",
+    "parentCode": "C",
+    "name": "Utilities",
+    "keywords": [ "heating", "electricity", "water" ],
+    "mcc": [ 4900 ]
+  },
+  {
+    "catCode": "10",
+    "parentCode": "C",
+    "name": "Internet",
+    "keywords": [ "internet", "internet bill" ],
+    "mcc": []
+  },
+  {
+    "catCode": "11",
+    "parentCode": "C",
+    "name": "Mobile Phone",
+    "keywords": [
+      "a1",
+      "telecom",
+      "phone bill"
+    ],
+    "mcc": [
+      4814
+    ]
+  },
+  {
+    "catCode": "12",
+    "parentCode": "C",
+    "name": "Television",
+    "keywords": [ "comcast", "television", "tv" ],
+    "mcc": [ 4899 ]
+  },
+  {
+    "catCode": "9",
+    "parentCode": "C",
+    "name": "Home Phone",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "15",
+    "parentCode": "D",
+    "name": "Books & Supplies",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "17",
+    "parentCode": "D",
+    "name": "Tuition",
+    "keywords": [ "tuition", "faculty", "college", "university" ],
+    "mcc": [ 8299 ]
+  },
+  {
+    "catCode": "23",
+    "parentCode": "E",
+    "name": "Newspapers & Magazines",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "22",
+    "parentCode": "E",
+    "name": "Music",
+    "keywords": [ "spotify" ],
+    "mcc": [
+      5733
+    ]
+  },
+  {
+    "catCode": "21",
+    "parentCode": "E",
+    "name": "Movies & DVDs",
+    "keywords": [ "hulu", "movie", "netflix", "movies" ],
+    "mcc": [
+      7829,
+      7832,
+      7841
+    ]
+  },
+  {
+    "catCode": "20",
+    "parentCode": "E",
+    "name": "Arts",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "28",
+    "parentCode": "F",
+    "name": "Late Fee",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "25",
+    "parentCode": "F",
+    "name": "ATM Fee",
+    "keywords": [ "atm withdrawal" ],
+    "mcc": [
+      6011
+    ]
+  },
+  {
+    "catCode": "26",
+    "parentCode": "F",
+    "name": "Bank Fee",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "33",
+    "parentCode": "G",
+    "name": "Life Insurance",
+    "keywords": ["life insurrance"],
+    "mcc": [6300]
+  },
+  {
+    "catCode": "41",
+    "parentCode": "H",
+    "name": "Charity",
+    "keywords": [ "red cross", "charity" ],
+    "mcc": [
+      8398
+    ]
+  },
+  {
+    "catCode": "42",
+    "parentCode": "H",
+    "name": "Gift",
+    "keywords": ["gift" , "birthday gift"],
+    "mcc": [5947]
+  },
+  {
+    "catCode": "44",
+    "parentCode": "I",
+    "name": "Dentist",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "46",
+    "parentCode": "I",
+    "name": "Eyecare",
+    "keywords": ["optics","sun glasses"],
+    "mcc": []
+  },
+  {
+    "catCode": "50",
+    "parentCode": "I",
+    "name": "Sports",
+    "keywords": [ "swimming" ],
+    "mcc": [
+      5996
+    ]
+  },
+  {
+    "catCode": "49",
+    "parentCode": "I",
+    "name": "Pharmacy",
+    "keywords": ["medicine"],
+    "mcc": []
+  },
+  {
+    "catCode": "48",
+    "parentCode": "I",
+    "name": "Health Insurance",
+    "keywords": [ "health insurance", "generali" ],
+    "mcc": [5912]
+  },
+  {
+    "catCode": "47",
+    "parentCode": "I",
+    "name": "Gym",
+    "keywords": [ "gym", "gym membership", "personal trainer" ],
+    "mcc": [ 7997 ]
+  },
+  {
+    "catCode": "45",
+    "parentCode": "I",
+    "name": "Doctor",
+    "keywords": ["doctor's appointment" , "doctor"],
+    "mcc": [8011]
+  },
+  {
+    "catCode": "56",
+    "parentCode": "J",
+    "name": "Home Supplies",
+    "keywords": [],
+    "mcc": [ 5200 ]
+  },
+  {
+    "catCode": "53",
+    "parentCode": "J",
+    "name": "Home Improvement",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "54",
+    "parentCode": "J",
+    "name": "Home Insurance",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "55",
+    "parentCode": "J",
+    "name": "Home Services",
+    "keywords": [ "cleaning", "home cleaning" ],
+    "mcc": [ 7349 ]
+  },
+  {
+    "catCode": "58",
+    "parentCode": "J",
+    "name": "Mortgage & Rent",
+    "keywords": ["monthly rent"],
+    "mcc": []
+  },
+  {
+    "catCode": "64",
+    "parentCode": "K",
+    "name": "Rental Income",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "60",
+    "parentCode": "K",
+    "name": "Bonus",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "61",
+    "parentCode": "K",
+    "name": "Interest Income",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "62",
+    "parentCode": "K",
+    "name": "Paycheck",
+    "keywords": [ "salary" ],
+    "mcc": []
+  },
+  {
+    "catCode": "71",
+    "parentCode": "L",
+    "name": "Kids Activities",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "67",
+    "parentCode": "L",
+    "name": "Allowance",
+    "keywords": [ "allowance" ],
+    "mcc": []
+  },
+  {
+    "catCode": "68",
+    "parentCode": "L",
+    "name": "Baby Supplies",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "72",
+    "parentCode": "L",
+    "name": "Toys",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "77",
+    "parentCode": "M",
+    "name": "Loan Payment",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "74",
+    "parentCode": "M",
+    "name": "Loan Fees and Charges",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "82",
+    "parentCode": "N",
+    "name": "Spa & Massage",
+    "keywords": [ "spa", "spa treatment", "massage" ],
+    "mcc": [ 8050 ]
+  },
+  {
+    "catCode": "80",
+    "parentCode": "N",
+    "name": "Hair",
+    "keywords": [ "barber", "haircut" ],
+    "mcc": [ 7230 ]
+  },
+  {
+    "catCode": "83",
+    "parentCode": "O",
+    "name": "Other",
+    "keywords": [ "hotel", "monthly stay" ],
+    "mcc": [ 5995 ]
+  },
+  {
+    "catCode": "85",
+    "parentCode": "O",
+    "name": "Pet Grooming",
+    "keywords": ["grooming"],
+    "mcc": []
+  },
+  {
+    "catCode": "86",
+    "parentCode": "O",
+    "name": "Veterinary",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "84",
+    "parentCode": "O",
+    "name": "Pet Food & Supplies",
+    "keywords": [ "pet shop" ],
+    "mcc": []
+  },
+  {
+    "catCode": "92",
+    "parentCode": "P",
+    "name": "Sporting Goods",
+    "keywords": [],
+    "mcc": [ 5655 ]
+  },
+  {
+    "catCode": "88",
+    "parentCode": "P",
+    "name": "Books",
+    "keywords": [ "new york times", "national geographic","book" ],
+    "mcc": [ 5192 ]
+  },
+  {
+    "catCode": "90",
+    "parentCode": "P",
+    "name": "Electronics & Software",
+    "keywords": [ "adobe", "office365", "tv", "games" ],
+    "mcc": [ 5045 ]
+  },
+  {
+    "catCode": "89",
+    "parentCode": "P",
+    "name": "Clothing",
+    "keywords": [ "tax" ],
+    "mcc": []
+  },
+  {
+    "catCode": "96",
+    "parentCode": "R",
+    "name": "Property Tax",
+    "keywords": [ "real estate", "residential property" ],
+    "mcc": [ 9311 ]
+  },
+  {
+    "catCode": "98",
+    "parentCode": "R",
+    "name": "Income Tax",
+    "keywords": [ "tax" ],
+    "mcc": [
+      9311
+    ]
+  },
+  {
+    "catCode": "100",
+    "parentCode": "S",
+    "name": "Credit Card Payment",
+    "keywords": [ "mastercard" ],
+    "mcc": []
+  },
+  {
+    "catCode": "103",
+    "parentCode": "T",
+    "name": "Air Travel",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "106",
+    "parentCode": "T",
+    "name": "Vacation",
+    "keywords": ["vacation"],
+    "mcc": [5962]
+  },
+  {
+    "catCode": "105",
+    "parentCode": "T",
+    "name": "Rental Car & Taxi",
+    "keywords": ["taxi","car rent"],
+    "mcc": [7519]
+  },
+  {
+    "catCode": "104",
+    "parentCode": "T",
+    "name": "Hotel",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "39",
+    "parentCode": "U",
+    "name": "Restaurants",
+    "keywords": [],
+    "mcc": [
+      5811,
+      5812,
+      5813,
+      5814
+    ]
+  },
+  {
+    "catCode": "38",
+    "parentCode": "U",
+    "name": "Groceries",
+    "keywords": [ "lidl", "ramstore", "delhaize", "vero", "supermarket" ],
+    "mcc": [
+      5300,
+      5309,
+      5310,
+      5311,
+      5331,
+      5399,
+      5411,
+      5411,
+      5422,
+      5422,
+      5441,
+      5441,
+      5441,
+      5451,
+      5462,
+      5499
+    ]
+  },
+
+  {
+    "catCode": "A",
+    "parentCode": "",
+    "name": "Misc Expenses",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "B",
+    "parentCode": "",
+    "name": "Auto & Transport",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "C",
+    "parentCode": "",
+    "name": "Bills & Utilities",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "D",
+    "parentCode": "",
+    "name": "Education",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "E",
+    "parentCode": "",
+    "name": "Entertainment",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "F",
+    "parentCode": "",
+    "name": "Fees & Charges",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "G",
+    "parentCode": "",
+    "name": "Financial",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "H",
+    "parentCode": "",
+    "name": "Gifts & Donations",
+    "keywords": [],
+    "mcc": []
+  },
+
+  {
+    "catCode": "I",
+    "parentCode": "",
+    "name": "Health & Fitness",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "J",
+    "parentCode": "",
+    "name": "Home",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "K",
+    "parentCode": "",
+    "name": "Income",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "L",
+    "parentCode": "",
+    "name": "Kids",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "M",
+    "parentCode": "",
+    "name": "Loans",
+    "keywords": [],
+    "mcc": []
+  },
+
+  {
+    "catCode": "N",
+    "parentCode": "",
+    "name": "Personal Care",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "O",
+    "parentCode": "",
+    "name": "Pets",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "P",
+    "parentCode": "",
+    "name": "Shopping",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "R",
+    "parentCode": "",
+    "name": "Taxes",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "S",
+    "parentCode": "",
+    "name": "Transfer",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "T",
+    "parentCode": "",
+    "name": "Travel",
+    "keywords": [],
+    "mcc": []
+  },
+  {
+    "catCode": "U",
+    "parentCode": "",
+    "name": "Food & Dining",
+    "keywords": [],
+    "mcc": []
+  }
+]

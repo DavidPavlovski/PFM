@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
 using PFM.DataAccess.UnitOfWork;
@@ -120,6 +122,11 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<ResponseModel>> SplitTransactionAsync(string transactionId, TransactionSplitDto model)
         {
+            if (model.Splits.Count <= 1)
+            {
+                var exception = new ArgumentException("Transaction split count must be greater than 1");
+                return new Result<ResponseModel>(exception);
+            }
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
             if (transaction is null)
             {
@@ -157,6 +164,51 @@ namespace PFM.Services.Implementation
                 });
             }
             _transactionSplitRepository.AddRange(splits);
+            try
+            {
+                await _unitOfWork.SaveChangesAsync();
+                var res = new ResponseModel
+                {
+                    Message = "Transaction split successfully."
+                };
+                return res;
+            }
+            catch
+            {
+                var exception = new Exception("Error occured while writing in database");
+                return new Result<ResponseModel>(exception);
+            }
+        }
+
+        public async Task<Result<ResponseModel>> AutoCategorize()
+        {
+            var transactions = _transactionRepository.GetAll();
+
+            List<Rule> rules = new();
+            using (StreamReader r = new("rules.json"))
+            {
+                string json = r.ReadToEnd();
+                rules = JsonConvert.DeserializeObject<List<Rule>>(json).ToList();
+            }
+
+            foreach (var transaction in transactions)
+            {
+                if (!string.IsNullOrEmpty(transaction.CatCode))
+                {
+                    continue;
+                }
+                foreach (var rule in rules)
+                {
+                    if (rule.Mcc.Any(x => x == transaction.Mcc))
+                    {
+                        transaction.CatCode = rule.CatCode;
+                    }
+                    else if (rule.Keywords.Any(x => transaction.BeneficiaryName.ToLower().Contains(x) || transaction.Description.ToLower().Contains(x)))
+                    {
+                        transaction.CatCode = rule.CatCode;
+                    }
+                }
+            }
             try
             {
                 await _unitOfWork.SaveChangesAsync();
