@@ -1,13 +1,10 @@
 ﻿namespace PFM.Exceptions
 {
-    public class FileErrorResponse
+    public class FileErrorResponse : ErrorResponse
     {
-        public string Description { get; set; }
-        public string Message { get; set; }
-        public int StatusCode { get; set; }
         public string CsvHeaders { get; set; }
 
-        public FileErrorResponse()
+        public FileErrorResponse() : base()
         {
             Description = "Error occured while processing your request";
         }

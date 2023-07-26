@@ -17,7 +17,7 @@ builder.Services.AddControllers().AddJsonOptions(opt =>
 {
     opt.InvalidModelStateResponseFactory = context =>
     {
-       var custom = new CustomBadRequest(context);
+        var custom = new CustomBadRequest(context);
         return new BadRequestObjectResult(custom);
     };
 });

@@ -54,6 +54,7 @@ namespace PFM.Helpers.Extensions
                 {
                     var errorResponse = new CSVErrorListResponse()
                     {
+                        Description = cex.Description,
                         Message = cex.Message,
                         StatusCode = 400,
                         Errors = cex.Errors

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using PFM.DataAccess.Entities;
+﻿using PFM.DataAccess.Entities;
 using PFM.Helpers.CSVParser;
 
 namespace PFM.Mapping.CSVMapping

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
@@ -15,7 +14,6 @@ using PFM.Mapping.CSVMapping;
 using PFM.Services.Abstraction;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
-using System;
 using System.Net;
 
 namespace PFM.Services.Implementation
@@ -29,7 +27,8 @@ namespace PFM.Services.Implementation
         readonly ISplitValidator _splitValidator;
         readonly ITransactionSplitRepository _transactionSplitRepository;
         readonly ICSVParser _csvParser;
-        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser)
+        readonly ICategoryRepository _categoryRepository;
+        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser, ICategoryRepository categoryRepository)
         {
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
@@ -38,6 +37,7 @@ namespace PFM.Services.Implementation
             _splitValidator = splitValidator;
             _transactionSplitRepository = transactionSplitRepository;
             _csvParser = csvParser;
+            _categoryRepository = categoryRepository;
         }
 
         public async Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter)
@@ -48,8 +48,6 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<ResponseModel>> ImportFromCSVAsync(IFormFile file)
         {
-
-
             var csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
             if (csvResponse is null)
             {
@@ -61,7 +59,7 @@ namespace PFM.Services.Implementation
             }
             if (csvResponse.Errors.Any())
             {
-                var exception = new CustomException("Error occured while reading CSV file")
+                var exception = new CustomException("One or more validation errors occured while reading file")
                 {
                     Description = "Problem occured while parsing CSV values , see errors below.",
                     StatusCode = HttpStatusCode.BadRequest,
@@ -70,7 +68,6 @@ namespace PFM.Services.Implementation
                 return new Result<ResponseModel>(exception);
             }
             _transactionRepository.ImportTransactions(csvResponse.Items);
-
 
             try
             {
@@ -81,7 +78,7 @@ namespace PFM.Services.Implementation
                 };
                 return res;
             }
-            catch
+            catch (Exception ex)
             {
                 var exception = new Exception("Error occured while writing in database");
                 return new Result<ResponseModel>(exception);
@@ -186,7 +183,15 @@ namespace PFM.Services.Implementation
         public async Task<Result<ResponseModel>> AutoCategorize()
         {
             var transactions = _transactionRepository.GetAll();
-
+            var catCodes = await _categoryRepository.GetCatCodesAsync();
+            if (catCodes.Count == 0)
+            {
+                var res = new ResponseModel
+                {
+                    Message = "No categories were found. Cannot continue with operation."
+                };
+                return res;
+            }
             List<Rule> rules = new();
             using (StreamReader r = new("rules.json"))
             {
@@ -202,6 +207,10 @@ namespace PFM.Services.Implementation
                 }
                 foreach (var rule in rules)
                 {
+                    if (!catCodes.Contains(rule.CatCode))
+                    {
+                        continue;
+                    }
                     if (rule.Mcc.Any(x => x == transaction.Mcc))
                     {
                         transaction.CatCode = rule.CatCode;
@@ -217,7 +226,7 @@ namespace PFM.Services.Implementation
                 await _unitOfWork.SaveChangesAsync();
                 var res = new ResponseModel
                 {
-                    Message = "Transaction split successfully."
+                    Message = "Transactions categorized successfully."
                 };
                 return res;
             }

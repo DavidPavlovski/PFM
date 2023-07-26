@@ -16,5 +16,11 @@ namespace PFM.DataAccess.Entities
         public string? CatCode { get; set; }
         public Category Category { get; set; }
         public List<TransactionSplit> TransactionSplits { get; set; }
+
+        public void Update(Transaction transaction)
+        {
+            BeneficiaryName = transaction.BeneficiaryName;
+            Description = transaction.Description;
+        }
     }
 }

@@ -5,7 +5,6 @@ using PFM.DataAccess.Repositories.Abstraction;
 using PFM.Helpers.Analytics;
 using PFM.Helpers.Extensions;
 using PFM.Helpers.PageSort;
-using System.Linq;
 
 namespace PFM.DataAccess.Repositories.Repository
 {
@@ -107,16 +106,32 @@ namespace PFM.DataAccess.Repositories.Repository
 
         public void ImportTransactions(List<Transaction> entities)
         {
+            var existingCategories = new HashSet<Transaction>(_dbContext.Transactions);
+
+            var entitiesToAdd = new List<Transaction>();
+            var entitiesToUpdate = new List<Transaction>();
+
             foreach (var entity in entities)
             {
-                if (_dbContext.Transactions.Contains(entity))
+                var e = existingCategories.FirstOrDefault(x => x.Id == entity.Id);
+                if (e is null)
                 {
-                    _dbContext.Transactions.Update(entity);
+                    entitiesToAdd.Add(entity);
                 }
                 else
                 {
-                    _dbContext.Transactions.Add(entity);
+                    e.Update(entity);
+                    entitiesToUpdate.Add(e);
                 }
+            }
+
+            if (entitiesToAdd.Count > 0)
+            {
+                _dbContext.Transactions.AddRange(entitiesToAdd);
+            }
+            if (entitiesToUpdate.Count > 0)
+            {
+                _dbContext.Transactions.UpdateRange(entitiesToUpdate);
             }
         }
 

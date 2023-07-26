@@ -1,5 +1,4 @@
 ﻿using PFM.Enums;
-using PFM.Helpers.PageSort;
 
 namespace PFM.Helpers.Analytics
 {

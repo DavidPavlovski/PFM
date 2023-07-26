@@ -28,19 +28,40 @@ namespace PFM.DataAccess.Repositories.Repository
                             .ToListAsync();
         }
 
-        public void ImportCategories(List<Category> entities)
+        public void ImportCategories(IEnumerable<Category> entities)
         {
+            var existingCategories = new HashSet<Category>(_dbContext.Categories);
+
+            var entitiesToAdd = new List<Category>();
+            var entitiesToUpdate = new List<Category>();
+
             foreach (var entity in entities)
             {
-                if (_dbContext.Categories.Contains(entity))
+                var e = existingCategories.FirstOrDefault(x => x.Code == entity.Code);
+                if (e is null)
                 {
-                    _dbContext.Categories.Update(entity);
+                    entitiesToAdd.Add(entity);
                 }
                 else
                 {
-                    _dbContext.Categories.Add(entity);
+                    e.Update(entity);
+                    entitiesToUpdate.Add(e);
                 }
             }
+
+            if (entitiesToAdd.Count > 0)
+            {
+                _dbContext.Categories.AddRange(entitiesToAdd);
+            }
+            if (entitiesToUpdate.Count > 0)
+            {
+                _dbContext.Categories.UpdateRange(entitiesToUpdate);
+            }
+        }
+
+        public async Task<List<string>> GetCatCodesAsync()
+        {
+            return await _dbContext.Categories.Select(x => x.Code).ToListAsync();
         }
     }
 }

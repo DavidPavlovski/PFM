@@ -24,11 +24,9 @@ namespace PFM.Helpers.CSVParser
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             var map = csv.Context.RegisterClassMap<TMap>();
 
-            var csvResponse = new CSVReponse<TEntity>
-            {
-                Items = new List<TEntity>(),
-                Errors = new List<CSVRowError>()
-            };
+            var items = new List<TEntity>();
+            var errors = new List<CSVRowError>();
+
             while (csv.Read())
             {
                 try
@@ -42,20 +40,25 @@ namespace PFM.Helpers.CSVParser
                             Row = csv.Context.Parser.RawRow,
                             Errors = map.Errors.Distinct().Select(x => x).ToList()
                         };
-                        csvResponse.Errors.Add(rowError);
-                        if (csvResponse.Errors.Count == rowErrorsCount)
+                        errors.Add(rowError);
+                        if (errors.Count == rowErrorsCount)
                         {
                             break;
                         }
                         continue;
                     }
-                    csvResponse.Items.Add(item);
+                    items.Add(item);
                 }
                 catch (CsvHelperException csvEx)
                 {
                     return default;
                 }
             }
+            var csvResponse = new CSVReponse<TEntity>
+            {
+                Items = items,
+                Errors = errors
+            };
             return csvResponse;
         }
     }

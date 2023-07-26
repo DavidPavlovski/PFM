@@ -1,6 +1,4 @@
-﻿using PFM.Enums;
-
-namespace PFM.Helpers.PageSort
+﻿namespace PFM.Helpers.PageSort
 {
     public class PagedSortedList<T>
     {

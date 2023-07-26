@@ -1,11 +1,12 @@
-﻿using System.Net;
-
-namespace PFM.Exceptions
+﻿namespace PFM.Exceptions
 {
-    public class CSVErrorListResponse
+    public class CSVErrorListResponse : ErrorResponse
     {
-        public string Message { get; set; }
-        public int StatusCode { get; set; }
         public List<CSVRowError> Errors { get; set; }
+
+        public CSVErrorListResponse() : base()
+        {
+
+        }
     }
 }
