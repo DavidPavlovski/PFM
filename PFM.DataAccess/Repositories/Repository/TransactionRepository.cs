@@ -61,7 +61,6 @@ namespace PFM.DataAccess.Repositories.Repository
         {
             var query = _dbContext
                             .Transactions
-                            .Include(x => x.Category)
                             .Include(x => x.TransactionSplits)
                             .AsQueryable();
 
@@ -104,35 +103,18 @@ namespace PFM.DataAccess.Repositories.Repository
             return new(pagerSorter, items, totalCount);
         }
 
-        public void ImportTransactions(List<Transaction> entities)
+        public async Task ImportTransactions(List<Transaction> entities, int batchSize)
         {
-            var existingCategories = new HashSet<Transaction>(_dbContext.Transactions);
-
-            var entitiesToAdd = new List<Transaction>();
-            var entitiesToUpdate = new List<Transaction>();
-
-            foreach (var entity in entities)
+            await _dbContext.BulkMergeAsync(entities, options =>
             {
-                var e = existingCategories.FirstOrDefault(x => x.Id == entity.Id);
-                if (e is null)
+                options.BatchSize = batchSize;
+                options.ColumnPrimaryKeyExpression = t => t.Id;
+                options.OnMergeUpdateInputExpression = t => new
                 {
-                    entitiesToAdd.Add(entity);
-                }
-                else
-                {
-                    e.Update(entity);
-                    entitiesToUpdate.Add(e);
-                }
-            }
-
-            if (entitiesToAdd.Count > 0)
-            {
-                _dbContext.Transactions.AddRange(entitiesToAdd);
-            }
-            if (entitiesToUpdate.Count > 0)
-            {
-                _dbContext.Transactions.UpdateRange(entitiesToUpdate);
-            }
+                    t.BeneficiaryName,
+                    t.Description
+                };
+            });
         }
 
         public void Update(Transaction entity)
@@ -140,9 +122,13 @@ namespace PFM.DataAccess.Repositories.Repository
             _dbContext.Transactions.Update(entity);
         }
 
-        public void UpdateRange(List<Transaction> entities)
+        public async Task UpdateRange(List<Transaction> entities)
         {
-            _dbContext.Transactions.UpdateRange(entities);
+            await _dbContext.BulkUpdateAsync(entities, options =>
+            {
+                options.BatchSize = 1000;
+                options.ColumnPrimaryKeyExpression = t => t.Id;
+            });
         }
     }
 }

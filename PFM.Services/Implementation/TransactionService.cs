@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LanguageExt.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
@@ -28,7 +29,8 @@ namespace PFM.Services.Implementation
         readonly ITransactionSplitRepository _transactionSplitRepository;
         readonly ICSVParser _csvParser;
         readonly ICategoryRepository _categoryRepository;
-        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser, ICategoryRepository categoryRepository)
+        readonly IConfiguration _configuration;
+        public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser, ICategoryRepository categoryRepository, IConfiguration configuration)
         {
             _transactionRepository = transactionRepository;
             _unitOfWork = unitOfWork;
@@ -38,40 +40,52 @@ namespace PFM.Services.Implementation
             _transactionSplitRepository = transactionSplitRepository;
             _csvParser = csvParser;
             _categoryRepository = categoryRepository;
+            _configuration = configuration;
         }
 
         public async Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter)
         {
+            var maxItemsForPagination = _configuration.GetValue<int>("variables:MaxItemsForPagination");
+            if (pagerSorter.PageSize <= 0)
+            {
+                pagerSorter.PageSize = maxItemsForPagination;
+            }
+            pagerSorter.PageSize = Math.Min(pagerSorter.PageSize, maxItemsForPagination);
+            if (pagerSorter.Page < 0)
+            {
+                pagerSorter.Page = 0;
+            }
             var res = await _transactionRepository.GetTransactionsAsync(pagerSorter);
             return _mapper.Map<PagedSortedList<TransactionResponseDto>>(res);
         }
 
         public async Task<Result<ResponseModel>> ImportFromCSVAsync(IFormFile file)
         {
-            var csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
-            if (csvResponse is null)
-            {
-                var error = new CustomFileLoadException($"Error occured while reading file: '{file.FileName}', make sure the file you uploaded is a valid CSV file and you have all the required headers.")
-                {
-                    CsvHeaders = "id, beneficiary-name, date, direction, amount, description, currency, mcc, kind"
-                };
-                return new Result<ResponseModel>(error);
-            }
-            if (csvResponse.Errors.Any())
-            {
-                var exception = new CustomException("One or more validation errors occured while reading file")
-                {
-                    Description = "Problem occured while parsing CSV values , see errors below.",
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Errors = csvResponse.Errors
-                };
-                return new Result<ResponseModel>(exception);
-            }
-            _transactionRepository.ImportTransactions(csvResponse.Items);
-
             try
             {
-                await _unitOfWork.SaveChangesAsync();
+                var csvResponse = _csvParser.ParseCSV<Transaction, TransactionCSVMap>(file);
+                if (csvResponse is null)
+                {
+                    var error = new CustomFileLoadException($"Error occured while reading file: '{file.FileName}', make sure the file you uploaded is a valid CSV file and you have all the required headers.")
+                    {
+                        CsvHeaders = "id, beneficiary-name, date, direction, amount, description, currency, mcc, kind"
+                    };
+                    return new Result<ResponseModel>(error);
+                }
+                if (csvResponse.Errors.Any())
+                {
+                    var exception = new CustomException("One or more validation errors occured while reading file")
+                    {
+                        Description = "Problem occured while parsing CSV values , see errors below.",
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Errors = csvResponse.Errors
+                    };
+                    return new Result<ResponseModel>(exception);
+                }
+                var batchSize = _configuration.GetValue<int>("variables:BatchSize");
+
+                await _transactionRepository.ImportTransactions(csvResponse.Items, batchSize);
+
                 var res = new ResponseModel
                 {
                     Message = "Transactions imported successfully."
@@ -104,6 +118,7 @@ namespace PFM.Services.Implementation
             }
             transaction.CatCode = model.CatCode;
             _transactionRepository.Update(transaction);
+
             try
             {
                 await _unitOfWork.SaveChangesAsync();
@@ -125,6 +140,11 @@ namespace PFM.Services.Implementation
             if (model.Splits.Count <= 1)
             {
                 var exception = new ArgumentException("Transaction split count must be greater than 1");
+                return new Result<ResponseModel>(exception);
+            }
+            if (model.Splits.Any(x => x.Ammount <= 0))
+            {
+                var exception = new ArgumentException("Transaction split ammount cannot be 0 or lower.");
                 return new Result<ResponseModel>(exception);
             }
             var transaction = await _transactionRepository.GetByIdAsync(transactionId);
@@ -182,48 +202,49 @@ namespace PFM.Services.Implementation
 
         public async Task<Result<ResponseModel>> AutoCategorize()
         {
-            var transactions = _transactionRepository.GetAll();
-            var catCodes = await _categoryRepository.GetCatCodesAsync();
-            if (catCodes.Count == 0)
+            try
             {
-                var res = new ResponseModel
+                var transactions = _transactionRepository.GetAll();
+                var catCodes = await _categoryRepository.GetCatCodesAsync();
+                if (catCodes.Count == 0)
                 {
-                    Message = "No categories were found. Cannot continue with operation."
-                };
-                return res;
-            }
-            List<Rule> rules = new();
-            using (StreamReader r = new("rules.json"))
-            {
-                string json = r.ReadToEnd();
-                rules = JsonConvert.DeserializeObject<List<Rule>>(json).ToList();
-            }
-
-            foreach (var transaction in transactions)
-            {
-                if (!string.IsNullOrEmpty(transaction.CatCode))
-                {
-                    continue;
+                    var err = new ResponseModel
+                    {
+                        Message = "No categories were found. Cannot continue with operation."
+                    };
+                    return err;
                 }
-                foreach (var rule in rules)
+                List<Rule> rules = new();
+                using (StreamReader r = new("rules.json"))
                 {
-                    if (!catCodes.Contains(rule.CatCode))
+                    string json = r.ReadToEnd();
+                    rules = JsonConvert.DeserializeObject<List<Rule>>(json).ToList();
+                }
+
+                foreach (var transaction in transactions)
+                {
+                    if (!string.IsNullOrEmpty(transaction.CatCode))
                     {
                         continue;
                     }
-                    if (rule.Mcc.Any(x => x == transaction.Mcc))
+                    foreach (var rule in rules)
                     {
-                        transaction.CatCode = rule.CatCode;
-                    }
-                    else if (rule.Keywords.Any(x => transaction.BeneficiaryName.ToLower().Contains(x) || transaction.Description.ToLower().Contains(x)))
-                    {
-                        transaction.CatCode = rule.CatCode;
+                        if (!catCodes.Contains(rule.CatCode))
+                        {
+                            continue;
+                        }
+                        if (rule.Mcc.Any(x => x == transaction.Mcc))
+                        {
+                            transaction.CatCode = rule.CatCode;
+                        }
+                        else if (rule.Keywords.Any(x => transaction.BeneficiaryName.ToLower().Contains(x) || transaction.Description.ToLower().Contains(x)))
+                        {
+                            transaction.CatCode = rule.CatCode;
+                        }
                     }
                 }
-            }
-            try
-            {
-                await _unitOfWork.SaveChangesAsync();
+                await _transactionRepository.UpdateRange(transactions.ToList());
+
                 var res = new ResponseModel
                 {
                     Message = "Transactions categorized successfully."

@@ -1,5 +1,4 @@
-﻿using PFM.DataTransfer.Category;
-using PFM.Enums;
+﻿using PFM.Enums;
 
 namespace PFM.DataTransfer.Transaction
 {
@@ -15,6 +14,6 @@ namespace PFM.DataTransfer.Transaction
         public int? Mcc { get; set; }
         public TransactionKind Kind { get; set; }
         public string? CatCode { get; set; }
-        public CategoryResponseDto Category { get; set; }
+        public List<TransactionSplitDto> TransactionSplits { get; set; }
     }
 }

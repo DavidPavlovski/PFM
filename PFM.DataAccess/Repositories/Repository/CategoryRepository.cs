@@ -28,35 +28,18 @@ namespace PFM.DataAccess.Repositories.Repository
                             .ToListAsync();
         }
 
-        public void ImportCategories(IEnumerable<Category> entities)
+        public async Task ImportCategories(IEnumerable<Category> entities , int batchSize)
         {
-            var existingCategories = new HashSet<Category>(_dbContext.Categories);
-
-            var entitiesToAdd = new List<Category>();
-            var entitiesToUpdate = new List<Category>();
-
-            foreach (var entity in entities)
+            await _dbContext.BulkMergeAsync(entities, options =>
             {
-                var e = existingCategories.FirstOrDefault(x => x.Code == entity.Code);
-                if (e is null)
+                options.BatchSize = batchSize;
+                options.ColumnPrimaryKeyExpression = t => t.Code;
+                options.OnMergeUpdateInputExpression = t => new
                 {
-                    entitiesToAdd.Add(entity);
-                }
-                else
-                {
-                    e.Update(entity);
-                    entitiesToUpdate.Add(e);
-                }
-            }
-
-            if (entitiesToAdd.Count > 0)
-            {
-                _dbContext.Categories.AddRange(entitiesToAdd);
-            }
-            if (entitiesToUpdate.Count > 0)
-            {
-                _dbContext.Categories.UpdateRange(entitiesToUpdate);
-            }
+                    t.ParentCode,
+                    t.Name
+                };
+            });
         }
 
         public async Task<List<string>> GetCatCodesAsync()
