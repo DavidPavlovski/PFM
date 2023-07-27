@@ -6,13 +6,13 @@ namespace PFM.DataAccess.Repositories.Abstraction
 {
     public interface ITransactionRepository
     {
-        IEnumerable<Transaction> GetAll();
-        Task<Transaction> GetByIdAsync(string id);
+        Task<List<Transaction>> GetTransactionsAnalyticsAsync(AnalyticsQuery analyticsQuery);
         Task<PagedSortedList<Transaction>> GetTransactionsAsync(PagerSorter pagerSorter);
-        Task ImportTransactions(List<Transaction> entities , int batchSize);
+        Task ImportTransactions(List<Transaction> entities, int batchSize);
+        Task UpdateRange(List<Transaction> entities);
+        Task<Transaction> GetByIdAsync(string id);
+        IEnumerable<Transaction> GetAll();
         Task<bool> ExistsAsync(string id);
         void Update(Transaction entity);
-        Task<List<Transaction>> GetTransactionsAnalyticsAsync(AnalyticsQuery analyticsQuery);
-        Task UpdateRange(List<Transaction> entities);
     }
 }
