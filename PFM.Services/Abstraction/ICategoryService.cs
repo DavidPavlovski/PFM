@@ -8,6 +8,6 @@ namespace PFM.Services.Abstraction
     public interface ICategoryService
     {
         Task<Result<ResponseModel>> ImportCategoriesAsync(IFormFile file);
-        Task<List<CategoryResponseDto>> GetCategories(string? parentCode);
+        Task<CategoryListDto> GetCategories(string? parentCode);
     }
 }

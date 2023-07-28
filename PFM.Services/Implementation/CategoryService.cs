@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using PFM.DataAccess.Entities;
 using PFM.DataAccess.Repositories.Abstraction;
-using PFM.DataAccess.UnitOfWork;
 using PFM.DataTransfer;
 using PFM.DataTransfer.Category;
 using PFM.Exceptions;
@@ -17,24 +16,28 @@ namespace PFM.Services.Implementation
 {
     public class CategoryService : ICategoryService
     {
-        readonly IUnitOfWork _unitOfWork;
         readonly ICategoryRepository _categoryRepository;
         readonly IMapper _mapper;
         readonly ICSVParser _csvParser;
         readonly IConfiguration _configuration;
-        public CategoryService(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository, IMapper mapper, ICSVParser csvParser, IConfiguration configuration)
+
+        const int DEFAULT_BATCH_SIZE = 1000;
+        public CategoryService(ICategoryRepository categoryRepository, IMapper mapper, ICSVParser csvParser, IConfiguration configuration)
         {
-            _unitOfWork = unitOfWork;
             _categoryRepository = categoryRepository;
             _mapper = mapper;
             _csvParser = csvParser;
             _configuration = configuration;
         }
 
-        public async Task<List<CategoryResponseDto>> GetCategories(string? parentCode)
+        public async Task<CategoryListDto> GetCategories(string? parentCode)
         {
             var res = await _categoryRepository.GetCategories(parentCode);
-            return _mapper.Map<List<CategoryResponseDto>>(res);
+
+            return new()
+            {
+                Items = _mapper.Map<List<CategoryResponseDto>>(res)
+            };
         }
 
         public async Task<Result<ResponseModel>> ImportCategoriesAsync(IFormFile file)
@@ -60,7 +63,7 @@ namespace PFM.Services.Implementation
                     };
                     return new Result<ResponseModel>(exception);
                 }
-                var batchSize = _configuration.GetValue<int>("variables:BatchSize");
+                var batchSize = _configuration.GetValue<int?>("variables:BatchSize") ?? DEFAULT_BATCH_SIZE;
                 await _categoryRepository.ImportCategories(csvResponse.Items, batchSize);
                 var res = new ResponseModel
                 {

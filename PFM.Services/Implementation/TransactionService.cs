@@ -16,6 +16,7 @@ using PFM.Services.Abstraction;
 using PFM.Validations.Category;
 using PFM.Validations.Split;
 using System.Net;
+using System.Web;
 
 namespace PFM.Services.Implementation
 {
@@ -30,6 +31,9 @@ namespace PFM.Services.Implementation
         readonly ICSVParser _csvParser;
         readonly ICategoryRepository _categoryRepository;
         readonly IConfiguration _configuration;
+
+        const int DEFAULT_BATCH_SIZE = 1000;
+        const int DEFAULT_PAGE_SIZE = 10;
         public TransactionService(ITransactionRepository transactionRepository, IUnitOfWork unitOfWork, IMapper mapper, ICategoryValidator categoryValidator, ISplitValidator splitValidator, ITransactionSplitRepository transactionSplitRepository, ICSVParser csvParser, ICategoryRepository categoryRepository, IConfiguration configuration)
         {
             _transactionRepository = transactionRepository;
@@ -45,15 +49,19 @@ namespace PFM.Services.Implementation
 
         public async Task<PagedSortedList<TransactionResponseDto>> GetTransactionsAsync(PagerSorter pagerSorter)
         {
-            var maxItemsForPagination = _configuration.GetValue<int>("variables:MaxItemsForPagination");
+            var itemsForPagination = _configuration.GetValue<int?>("variables:MaxItemsForPagination") ?? DEFAULT_PAGE_SIZE;
             if (pagerSorter.PageSize <= 0)
             {
-                pagerSorter.PageSize = maxItemsForPagination;
+                pagerSorter.PageSize = itemsForPagination;
             }
-            pagerSorter.PageSize = Math.Min(pagerSorter.PageSize, maxItemsForPagination);
-            if (pagerSorter.Page < 0)
+            pagerSorter.PageSize = Math.Min(pagerSorter.PageSize, itemsForPagination);
+            if (pagerSorter.Page < 1)
             {
-                pagerSorter.Page = 0;
+                pagerSorter.Page = 1;
+            }
+            if (string.IsNullOrEmpty(pagerSorter.SortBy))
+            {
+                pagerSorter.SortBy = "date";
             }
             var res = await _transactionRepository.GetTransactionsAsync(pagerSorter);
             return _mapper.Map<PagedSortedList<TransactionResponseDto>>(res);
@@ -82,7 +90,7 @@ namespace PFM.Services.Implementation
                     };
                     return new Result<ResponseModel>(exception);
                 }
-                var batchSize = _configuration.GetValue<int>("variables:BatchSize");
+                var batchSize = _configuration.GetValue<int?>("variables:BatchSize") ?? DEFAULT_BATCH_SIZE;
 
                 await _transactionRepository.ImportTransactions(csvResponse.Items, batchSize);
 

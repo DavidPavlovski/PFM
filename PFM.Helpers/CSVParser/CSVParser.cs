@@ -11,7 +11,7 @@ namespace PFM.Helpers.CSVParser
     public class CSVParser : ICSVParser
     {
         readonly IConfiguration _configuration;
-        private const int MAX_ROW_ERRORS = 15;
+        private const int DEFAULT_ROW_ERRORS = 15;
         public CSVParser(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -19,7 +19,8 @@ namespace PFM.Helpers.CSVParser
 
         public CSVReponse<TEntity> ParseCSV<TEntity, TMap>(IFormFile file) where TMap : CustomClassMap<TEntity>
         {
-            var rowErrorsCount = Math.Min(_configuration.GetValue<int>("variables:CSVErrorRows"), MAX_ROW_ERRORS);
+            var rowErrorsCount = _configuration.GetValue<int?>("variables:CSVErrorRows") ?? DEFAULT_ROW_ERRORS;
+
             using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             var map = csv.Context.RegisterClassMap<TMap>();
