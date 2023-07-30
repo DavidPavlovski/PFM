@@ -1,0 +1,33 @@
+code,parent-code,name
+A,,Misc Expenses
+B,,Auto & Transport
+C,,Bills & Utilities
+D,,Education
+E,,Entertainment
+F,,Fees & Charges
+G,,Financial
+H,,Gifts & Donations
+I,,Health & Fitness
+J,,Home
+K,,Income
+L,,Kids
+M,,Loans
+N,,Personal Care
+O,,Pets
+P,,Shopping
+R,,Taxes
+S,,Transfer
+T,,Travel
+U,,Food & Dining
+Z,,Split
+0,A,Other
+1,B,Other
+2,B,Auto Insurance
+3,B,Auto Leasing
+4,B,Gas & Fuel
+5,B,Parking
+7,B,Service & Parts
+9,C,Home Phone
+10,C,Internet
+11,C,Mobile Phone
+12,C,Television

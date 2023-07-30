@@ -1,0 +1,1393 @@
+{
+	"info": {
+		"_postman_id": "470216ea-8f0b-49a7-917b-06bb5e740498",
+		"name": "PFM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14921888"
+	},
+	"item": [
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Import",
+					"item": [
+						{
+							"name": "Import_Categories",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"message\":\"\"\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Rade/Desktop/postman/categories_2.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Category/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Category",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import_Categories_Invalid_File",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"var expectedObject = {\r",
+											"  \"csvHeaders\": \"\",\r",
+											"  \"description\": \"\",\r",
+											"  \"message\": \"\",\r",
+											"  \"statusCode\": 0\r",
+											"};\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function() {\r",
+											"  pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object properties have the correct data types and values\", function() {\r",
+											"  pm.expect(responseObject.csvHeaders).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.description).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.message).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.statusCode).to.be.a(\"number\").and.greaterThan(0);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"CSV Headers should be a comma-separated string\", function() {\r",
+											"  pm.expect(responseObject.csvHeaders.split(',')).to.have.lengthOf.at.least(1);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Rade/Desktop/postman/README.md"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Category/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Category",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import_Categories_With_Errors",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function() {\r",
+											"  pm.expect(responseObject).to.have.property(\"errors\");\r",
+											"  pm.expect(responseObject.errors).to.be.an(\"array\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error object has correct properties\",function(){\r",
+											"    const errors = pm.response.json().errors;\r",
+											"    pm.expect(errors).to.be.an(\"array\");\r",
+											"    errors.forEach(e => {\r",
+											"        pm.expect(e).to.have.property(\"row\");\r",
+											"        pm.expect(e.row).to.be.a(\"number\");\r",
+											"\r",
+											"        pm.expect(e).to.have.property(\"errors\");\r",
+											"        pm.expect(e.errors).to.be.an(\"array\");\r",
+											"        pm.expect(e.errors.length).to.be.above(0);\r",
+											"\r",
+											"        e.errors.forEach(err => {\r",
+											"            pm.expect(err).to.be.a(\"string\");\r",
+											"        })\r",
+											"    })\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "categories_errors.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Category/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Category",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get_Categories",
+					"item": [
+						{
+							"name": "GetCategoriesByParentCode",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has correct structure\",function(){\r",
+											"    pm.expect(responseObject).to.be.an(\"object\");\r",
+											"    pm.expect(responseObject).to.have.property(\"items\").and.to.be.an(\"array\");\r",
+											"    \r",
+											"});\r",
+											"\r",
+											"pm.test(\"Category object has correct structure\",function(){\r",
+											"    var items = responseObject.items;\r",
+											"    items.forEach(i => {\r",
+											"        pm.expect(i).to.have.property(\"code\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"        pm.expect(i).to.have.property(\"parentCode\").and.to.be.a(\"string\");\r",
+											"        pm.expect(i).to.have.property(\"name\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    })\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7067/api/Category?parentCode=",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Category"
+									],
+									"query": [
+										{
+											"key": "parentCode",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"item": [
+				{
+					"name": "Import",
+					"item": [
+						{
+							"name": "Import_Transactions",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"message\":\"\"\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Rade/Desktop/postman/transactions_2.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import_Transactions_With_Errors",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function() {\r",
+											"  pm.expect(responseObject).to.have.property(\"errors\");\r",
+											"  pm.expect(responseObject.errors).to.be.an(\"array\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error object has correct properties\",function(){\r",
+											"    const errors = pm.response.json().errors;\r",
+											"    pm.expect(errors).to.be.an(\"array\");\r",
+											"    errors.forEach(e => {\r",
+											"        pm.expect(e).to.have.property(\"row\");\r",
+											"        pm.expect(e.row).to.be.a(\"number\");\r",
+											"\r",
+											"        pm.expect(e).to.have.property(\"errors\");\r",
+											"        pm.expect(e.errors).to.be.an(\"array\");\r",
+											"        pm.expect(e.errors.length).to.be.above(0);\r",
+											"\r",
+											"        e.errors.forEach(err => {\r",
+											"            pm.expect(err).to.be.a(\"string\");\r",
+											"        })\r",
+											"    })\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Rade/Desktop/postman/transactions_errors.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Import_Transactions_Invalid_File",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"var expectedObject = {\r",
+											"  \"csvHeaders\": \"\",\r",
+											"  \"description\": \"\",\r",
+											"  \"message\": \"\",\r",
+											"  \"statusCode\": 0\r",
+											"};\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function() {\r",
+											"  pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object properties have the correct data types and values\", function() {\r",
+											"  pm.expect(responseObject.csvHeaders).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.description).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.message).to.be.a(\"string\").and.not.empty;\r",
+											"  pm.expect(responseObject.statusCode).to.be.a(\"number\").and.greaterThan(0);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"CSV Headers should be a comma-separated string\", function() {\r",
+											"  pm.expect(responseObject.csvHeaders.split(',')).to.have.lengthOf.at.least(1);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/Rade/Desktop/postman/README.md"
+										}
+									]
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/Import",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"Import"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Transactions_Paged_View",
+					"item": [
+						{
+							"name": "Get_Transactions",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"var sortOrder = ['asc','desc'];\r",
+											"var directions = [\"d\",\"c\"];\r",
+											"var transactionKinds = [\"dep\",\"wdw\",\"pmt\",\"fee\",\"inc\",\"rev\",\"adj\",\"lnd\",\"lnr\",\"fcx\",\"aop\",\"acl\",\"spl\",\"sal\"]\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has correct structure\",function(){\r",
+											"    pm.expect(responseObject).to.have.property(\"page\");\r",
+											"    pm.expect(responseObject.page).to.be.a(\"number\").and.to.be.at.least(0);\r",
+											"    pm.expect(responseObject).to.have.property(\"pageSize\");\r",
+											"    pm.expect(responseObject.pageSize).to.be.a(\"number\");\r",
+											"    pm.expect(responseObject).to.have.property(\"totalPages\").and.to.be.a(\"number\");\r",
+											"    pm.expect(responseObject).to.have.property(\"sortBy\").and.to.be.a(\"string\");\r",
+											"    pm.expect(responseObject).to.have.property(\"sortOrder\");\r",
+											"    pm.expect(responseObject).to.have.property(\"totalCount\").and.to.be.a(\"number\");\r",
+											"    pm.expect(responseObject).to.have.property(\"items\").and.to.be.an(\"array\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Item object has correct structure\",function(){\r",
+											"    var items = responseObject.items;\r",
+											"    items.forEach(i => {\r",
+											"        pm.expect(i).to.have.property(\"id\").and.to.be.a(\"string\");\r",
+											"        pm.expect(i).to.have.property(\"beneficiaryName\").and.to.be.a(\"string\");\r",
+											"        pm.expect(i).to.have.property(\"date\");\r",
+											"        pm.expect(i).to.have.property(\"direction\").and.to.be.oneOf(directions);\r",
+											"        pm.expect(i).to.have.property(\"ammount\").and.to.be.a(\"number\").and.to.be.greaterThan(0);\r",
+											"        pm.expect(i).to.have.property(\"description\").and.to.be.a(\"string\");\r",
+											"        pm.expect(i).to.have.property(\"kind\").and.to.be.a(\"string\");\r",
+											"    })\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Direction is valid\",function(){\r",
+											"    var items = responseObject.items;\r",
+											"    items.forEach(i => {\r",
+											"        pm.expect(i).to.have.property(\"direction\").and.to.be.a(\"string\").and.to.be.oneOf(directions);\r",
+											"    });\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Sort order is valid\",function(){\r",
+											"    pm.expect(responseObject).to.have.property(\"sortOrder\").and.to.be.a(\"string\").and.to.be.oneOf(sortOrder);\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Kind is valid\" , function(){\r",
+											"    var items = responseObject.items;\r",
+											"    items.forEach(i => {\r",
+											"        pm.expect(i).to.have.property(\"kind\").and.to.be.a(\"string\").and.to.be.oneOf(transactionKinds);\r",
+											"    });\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction?transactionKind=pmt&startDate=01-01-2021&endDate=02-02-2021&page=0&pageSize=10&sortBy=&sortOrder=asc",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction"
+									],
+									"query": [
+										{
+											"key": "transactionKind",
+											"value": "pmt"
+										},
+										{
+											"key": "startDate",
+											"value": "01-01-2021"
+										},
+										{
+											"key": "endDate",
+											"value": "02-02-2021"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										},
+										{
+											"key": "sortBy",
+											"value": ""
+										},
+										{
+											"key": "sortOrder",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get_Transactions_With_Errors",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\",function(){\r",
+											"    pm.expect(responseObject).to.have.property(\"message\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"details\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"title\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"status\").and.to.be.a(\"number\").and.to.be.greaterThan(0);\r",
+											"    pm.expect(responseObject).to.have.property(\"errors\").and.to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error object has correct structure\" , function(){\r",
+											"    var errors = responseObject.errors;\r",
+											"    for(var key in errors){\r",
+											"        pm.expect(errors[key]).to.be.an(\"array\");\r",
+											"        pm.expect(errors[key].length).to.be.greaterThan(0);\r",
+											"        for(const message of errors[key]){\r",
+											"            pm.expect(message).to.be.a(\"string\").and.to.not.be.empty;\r",
+											"        }\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction?transactionKind=pmt123&startDate=2021-01-03&endDate=test&page=0&pageSize=10&sortBy=beneficiaryName&sortOrder=asc",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction"
+									],
+									"query": [
+										{
+											"key": "transactionKind",
+											"value": "pmt123"
+										},
+										{
+											"key": "startDate",
+											"value": "2021-01-03"
+										},
+										{
+											"key": "endDate",
+											"value": "test"
+										},
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										},
+										{
+											"key": "sortBy",
+											"value": "beneficiaryName"
+										},
+										{
+											"key": "sortOrder",
+											"value": "asc"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Split_Transaction",
+					"item": [
+						{
+							"name": "Split_Transaction",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"message\":\"\"\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"splits\": [\r\n        {\r\n            \"catCode\": \"A\",\r\n            \"ammount\": 10.5\r\n        },\r\n        {\r\n            \"catCode\": \"B\",\r\n            \"ammount\": 14\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10058284/Split",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10058284",
+										"Split"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Split_Transaction_Invalid_TransactionId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.notFound;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\":\"\",\r",
+											"    \"message\":\"\",\r",
+											"    \"statusCode\":0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"splits\": [\r\n        {\r\n            \"catCode\": \"A\",\r\n            \"ammount\": 10.5\r\n        },\r\n        {\r\n            \"catCode\": \"B\",\r\n            \"ammount\": 14\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10058284aaa/Split",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10058284aaa",
+										"Split"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Split_Transaction_Invalid_CategoryId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.notFound;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\":\"\",\r",
+											"    \"message\":\"\",\r",
+											"    \"statusCode\":0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"splits\": [\r\n        {\r\n            \"catCode\": \"Aasd\",\r\n            \"ammount\": 10.5\r\n        },\r\n        {\r\n            \"catCode\": \"B\",\r\n            \"ammount\": 14\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10058284/Split",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10058284",
+										"Split"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Split_Transaction_Invalid_Split_Count",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\":\"\",\r",
+											"    \"message\":\"\",\r",
+											"    \"statusCode\":0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"splits\": [\r\n        {\r\n            \"catCode\": \"A\",\r\n            \"ammount\": 24.5\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10058284/Split",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10058284",
+										"Split"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Split_Transaction_Invalid_Split_Ammount",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\":\"\",\r",
+											"    \"message\":\"\",\r",
+											"    \"statusCode\":0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"splits\": [\r\n        {\r\n            \"catCode\": \"A\",\r\n            \"ammount\": 24.5\r\n        },\r\n        {\r\n            \"catCode\": \"B\",\r\n            \"ammount\": 32.5\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10058284/Split",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10058284",
+										"Split"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Categorize_Transaction",
+					"item": [
+						{
+							"name": "Categorize_Transaction",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"message\":\"\"\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"catCode\": \"A\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10517968/Categorize",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10517968",
+										"Categorize"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Categorize_Transaction_Invalid_TransactionId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.be.notFound;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\": \"\",\r",
+											"    \"message\": \"\",\r",
+											"    \"statusCode\": 0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"catCode\": \"A\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10517968aaa/Categorize",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10517968aaa",
+										"Categorize"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Categorize_Transaction_Invalid_CategoryId",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.be.notFound;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"\r",
+											"var expectedObject={\r",
+											"    \"description\": \"\",\r",
+											"    \"message\": \"\",\r",
+											"    \"statusCode\": 0\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\", function () {\r",
+											"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"catCode\": \"A123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:7067/api/Transaction/10517968/Categorize",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Transaction",
+										"10517968",
+										"Categorize"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Analitycs",
+			"item": [
+				{
+					"name": "Analitycs_View",
+					"item": [
+						{
+							"name": "Analitycs_View",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.be.ok;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has correct structure\",function(){\r",
+											"    pm.expect(responseObject).to.have.property(\"groups\").and.to.be.an(\"array\");\r",
+											"    \r",
+											"});\r",
+											"\r",
+											"pm.test(\"Group object has correct structure\",function(){\r",
+											"    var items = responseObject.groups;\r",
+											"    items.forEach(i => {\r",
+											"        pm.expect(i).to.have.property(\"catCode\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"        pm.expect(i).to.have.property(\"ammount\").and.to.be.a(\"number\").and.to.be.greaterThan(0);\r",
+											"        pm.expect(i).to.have.property(\"count\").and.to.be.a(\"number\").and.to.be.greaterThan(0);\r",
+											"    })\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7067/api/Analitycs/spending-analytics?catCode=&startDate=01-01-2021&endDate=02-02-2021&direction=",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Analitycs",
+										"spending-analytics"
+									],
+									"query": [
+										{
+											"key": "catCode",
+											"value": ""
+										},
+										{
+											"key": "startDate",
+											"value": "01-01-2021"
+										},
+										{
+											"key": "endDate",
+											"value": "02-02-2021"
+										},
+										{
+											"key": "direction",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Analitycs_View_With_Errors",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var responseObject = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 400\", function () {\r",
+											"    pm.response.to.be.badRequest;\r",
+											"    pm.response.to.be.json;\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Object has the correct structure\",function(){\r",
+											"    pm.expect(responseObject).to.have.property(\"message\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"details\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"title\").and.to.be.a(\"string\").and.to.not.be.empty;\r",
+											"    pm.expect(responseObject).to.have.property(\"status\").and.to.be.a(\"number\").and.to.be.greaterThan(0);\r",
+											"    pm.expect(responseObject).to.have.property(\"errors\").and.to.be.an(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Error object has correct structure\" , function(){\r",
+											"    var errors = responseObject.errors;\r",
+											"    for(var key in errors){\r",
+											"        pm.expect(errors[key]).to.be.an(\"array\");\r",
+											"        pm.expect(errors[key].length).to.be.greaterThan(0);\r",
+											"        for(const message of errors[key]){\r",
+											"            pm.expect(message).to.be.a(\"string\").and.to.not.be.empty;\r",
+											"        }\r",
+											"    }\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:7067/api/Analitycs/spending-analytics?catCode=&startDate=2021-01-01&endDate=test&direction=test",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "7067",
+									"path": [
+										"api",
+										"Analitycs",
+										"spending-analytics"
+									],
+									"query": [
+										{
+											"key": "catCode",
+											"value": ""
+										},
+										{
+											"key": "startDate",
+											"value": "2021-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "test"
+										},
+										{
+											"key": "direction",
+											"value": "test"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Auto_Categorize",
+			"item": [
+				{
+					"name": "AutoCategorize",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var responseObject = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.be.ok;\r",
+									"    pm.response.to.be.json;\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var expectedObject={\r",
+									"    \"message\":\"\"\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Object has the correct structure\", function () {\r",
+									"   pm.expect(responseObject).to.have.keys(Object.keys(expectedObject));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:7067/api/Transaction/AutoCategorize",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7067",
+							"path": [
+								"api",
+								"Transaction",
+								"AutoCategorize"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "transactionId",
+			"value": "transactionId"
+		},
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:7067/api"
+		}
+	]
+}
